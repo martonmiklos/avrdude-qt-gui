@@ -4,10 +4,6 @@
 AvrPart::AvrPart(Settings *sa, FuseModel *fa, QObject *parent) :
     QObject(parent), settings(sa), fuseModel(fa)
 {
-    if (!QFile::exists(settings->xmlsPath)) {
-        qWarning() << ("The xml directory does not exists");
-        return;
-    }
     fillPartNosMap();
 }
 

@@ -72,6 +72,23 @@ MainWindow::MainWindow(QWidget *parent) :
     } else {
         ui->tabWidgetMain->setCurrentIndex(settings->defaultTabIndex);
     }
+
+    QDir xmlDir(settings->xmlsPath);
+    if ((!xmlDir.exists()) || (xmlDir.entryList(QStringList("*.xml")).isEmpty())) {
+        QMessageBox xmlMsg(QMessageBox::Critical,
+                           tr("The xml files directory does not exists, or it does not contains XML files"),
+                           tr("The program is using AVR description XML files.\n"
+                              "These files are provided with the Avrstudio.\n"
+                              "If you have Avrstudio installed go to the Settings tab\n"
+                              "and browse the PartDescriptionFiles directory from the Avrstudio's install dir.\n"
+                              "If you do not have Avrstudio you can obtain it from the "
+                              "<a href='http://www.atmel.com/dyn/products/tools_card.asp?tool_id=2725'>Atmel's website</a> for free.\n"
+                              "If you can't or don't want to download it do not worry, the basic functions will work without it."));
+        xmlMsg.setTextFormat(Qt::RichText);
+        xmlMsg.exec();
+        ui->tabWidgetMain->setCurrentWidget(ui->tabSettings);
+        ui->lineEditXmlsPath->setFocus(Qt::TabFocusReason);
+    }
 }
 
 MainWindow::~MainWindow()
