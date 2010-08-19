@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="tabMain">
        <attribute name="title">
@@ -503,41 +503,89 @@
         <string>Settings</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="QLabel" name="partDescriptionXMLsLabel">
-          <property name="text">
-           <string>Part description XMLs:</string>
+        <item row="2" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_6">
+          <property name="title">
+           <string>Paths</string>
           </property>
+          <layout class="QGridLayout" name="gridLayout_9">
+           <item row="0" column="0">
+            <widget class="QLabel" name="partDescriptionXMLsLabel">
+             <property name="text">
+              <string>Part description XMLs:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="lineEditXmlsPath"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="avrdudeLabel">
+             <property name="text">
+              <string>Avrdude binary:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="lineEditAvrDudePath"/>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="pushButtonBrowseXmls">
+             <property name="text">
+              <string>Browse</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="pushButtonAvrDude">
+             <property name="text">
+              <string>Browse</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEditXmlsPath"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="avrdudeLabel">
-          <property name="text">
-           <string>Avrdude binary:</string>
+        <item row="3" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_7">
+          <property name="title">
+           <string>GUI settings</string>
           </property>
+          <layout class="QGridLayout" name="gridLayout_10">
+           <item row="0" column="0" colspan="2">
+            <widget class="QCheckBox" name="checkBoxLastTabRemember">
+             <property name="text">
+              <string>Remember to the last used tab</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="comboBoxDefaultTab"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelDefaultTab">
+             <property name="text">
+              <string>Default tab:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEditAvrDudePath"/>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="pushButtonAvrDude">
-          <property name="text">
-           <string>Browse</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="pushButtonBrowseXmls">
-          <property name="text">
-           <string>Browse</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
+        <item row="4" column="0">
          <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -648,6 +696,7 @@ p, li { white-space: pre-wrap; }
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;

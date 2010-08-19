@@ -48,6 +48,7 @@ public:
     void readFlash(QString hexFileName);
     void readFuse();
     void writeFuse(quint8 hfuse, quint8 lfuse);
+    bool isWorking() const {return currentDudeTask == DudeTaskNone;}
 
 signals:
     void signatureReadSignal(quint8 sign0, quint8 sing1, quint8 sign2);

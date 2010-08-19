@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     fillDeviceList();
     fillProgrammersList();
     calculateArgumentsLabelText();
+    fillDefaultTabComboBox();
 
     fuseModel = new FuseModel(this);
 
@@ -65,10 +66,20 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(avrProgrammer, SIGNAL(progressStep()), this, SLOT(progressStep())); // this will output nice dots to the messages view during the long operations
     connect(avrProgrammer, SIGNAL(verifyMismatch(QString,int,int,int)), this, SLOT(verifyFailed(QString,int,int,int)));
 
+    ui->checkBoxLastTabRemember->setChecked(settings->rememberLastTab);
+    if (settings->rememberLastTab == true) {
+        ui->tabWidgetMain->setCurrentIndex(settings->lastTabIndex);
+    } else {
+        ui->tabWidgetMain->setCurrentIndex(settings->defaultTabIndex);
+    }
 }
 
 MainWindow::~MainWindow()
 {
+    settings->lastTabIndex = ui->tabWidgetMain->currentIndex();
+    if (avrProgrammer->isWorking()) {
+
+    }
     delete ui;
 }
 
@@ -138,6 +149,16 @@ void MainWindow::calculateArgumentsLabelText()
 {
     QString args = QString("-c %1 -P %2").arg(settings->programmerName).arg(settings->programmerPort);
     ui->labelCurrentArgumentsValue->setText(args);
+}
+
+void MainWindow::fillDefaultTabComboBox()
+{
+    for (int i = 0; i<ui->tabWidgetMain->count(); i++) {
+        ui->comboBoxDefaultTab->addItem(ui->tabWidgetMain->tabIcon(i),
+                                        ui->tabWidgetMain->tabText(i),
+                                        i);
+    }
+    ui->comboBoxDefaultTab->setCurrentIndex(settings->defaultTabIndex);
 }
 
 void MainWindow::reloadFuseView()
@@ -526,4 +547,19 @@ void MainWindow::on_pushButtonReadFuses_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     QApplication::aboutQt();
+}
+
+void MainWindow::on_checkBoxLastTabRemember_toggled(bool checked)
+{
+    settings->rememberLastTab = checked;
+    ui->comboBoxDefaultTab->setEnabled(!checked);
+}
+
+void MainWindow::on_comboBoxDefaultTab_currentIndexChanged(int index)
+{
+}
+
+void MainWindow::on_comboBoxDefaultTab_activated(int index)
+{
+    settings->defaultTabIndex = index;
 }

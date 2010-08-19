@@ -46,8 +46,12 @@ private:
     void fillDeviceList();
     void fillProgrammersList();
     void calculateArgumentsLabelText();
+    void fillDefaultTabComboBox();
 
 private slots:
+    void on_comboBoxDefaultTab_activated(int index);
+    void on_comboBoxDefaultTab_currentIndexChanged(int index);
+    void on_checkBoxLastTabRemember_toggled(bool checked);
     void on_pushButton_2_clicked();
     void on_pushButtonReadFuses_clicked();
     void on_pushButtonProgramFuses_clicked();
