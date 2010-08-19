@@ -23,12 +23,15 @@ typedef enum
     DudeTaskNone ,
     DudeTaskReadSignature,
     DudeTaskErase,
-    DudeTaskProgramFlash,
+    DudeTaskWriteFlash,
     DudeTaskReadFlash,
     DudeTaskVerifyFlash,
     DudeTaskReadFuse,
     DudeTaskWriteFuse,
     DudeTaskVerifyFuse,
+    DudeTaskReadEEPROM,
+    DudeTaskWriteEEPROM,
+    DudeTaskVerifyEEPROM,
 
 } CurrentDudeTask;
 
@@ -43,9 +46,15 @@ public:
     PortType getPortType() const {return portType;}
     void readSignature();
     void eraseDevice();
+
     void programFlash(QString hexFileName, bool verifyAfter = true, bool eraseBefore = true);
     void verifyFlash(QString hexFileName);
     void readFlash(QString hexFileName);
+
+    void programEEPROM(QString hexFileName);
+    void verifyEEPROM(QString hexFileName);
+    void readEEPROM(QString hexFileName);
+
     void readFuse();
     void writeFuse(quint8 hfuse, quint8 lfuse);
     bool isWorking() const {return currentDudeTask == DudeTaskNone;}

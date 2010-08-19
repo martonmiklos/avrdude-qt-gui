@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     avrProgrammer = new AvrProgrammer(settings, this);
     connect(avrProgrammer, SIGNAL(avrDudeOut(QString)), this, SLOT(avrDudeOut(QString)));
     connect(avrProgrammer, SIGNAL(signatureReadSignal(quint8,quint8,quint8)), this, SLOT(signatureRead(quint8,quint8,quint8)));
-    connect(avrProgrammer, SIGNAL(taskFailed(QString)), this, SLOT(logMessage(QString)));
+    connect(avrProgrammer, SIGNAL(taskFailed(QString)), this, SLOT(logError(QString)));
     connect(avrProgrammer, SIGNAL(taskFinishedOk(QString)), this,SLOT(logMessage(QString)));
     connect(avrProgrammer, SIGNAL(progressStep()), this, SLOT(progressStep())); // this will output nice dots to the messages view during the long operations
     connect(avrProgrammer, SIGNAL(verifyMismatch(QString,int,int,int)), this, SLOT(verifyFailed(QString,int,int,int)));
@@ -198,6 +198,8 @@ void MainWindow::verifyFailed(QString what, int offset, int value_read, int valu
                        .arg(what).arg(offset).arg(value_read).arg(value_waited));
     msgBox.exec();
 }
+
+
 
 void MainWindow::fillDeviceList()
 {
@@ -463,6 +465,13 @@ void MainWindow::logMessage(QString msg)
     ui->textEditMessages->append(msg);
 }
 
+void MainWindow::logError(QString msg)
+{
+    msg.prepend("<p style=\"color:red;\">");
+    msg.append("</p>");
+    ui->textEditMessages->append(msg);
+}
+
 void MainWindow::showFlashHexFileBrowse()
 {
     QString path;
@@ -530,7 +539,6 @@ void MainWindow::on_pushButtonVerifyFlash_clicked()
     } else {
         logMessage(tr("Cannot verify because the etalon hex file does not exists"));
     }
-
 }
 
 void MainWindow::on_pushButtonReadReadFlash_clicked()
@@ -579,4 +587,48 @@ void MainWindow::on_comboBoxDefaultTab_currentIndexChanged(int index)
 void MainWindow::on_comboBoxDefaultTab_activated(int index)
 {
     settings->defaultTabIndex = index;
+}
+
+void MainWindow::on_pushButtonProgramEEPROM_clicked()
+{
+    if (QFile::exists(ui->lineEditEEPROMHex->text())){
+        avrProgrammer->programEEPROM(ui->lineEditEEPROMHex->text());
+        logMessage(tr("Programming the EEPROM memory"));
+    } else {
+        logMessage(tr("Cannot write the EEPROM, because the input hex file not exists"));
+    }
+}
+
+void MainWindow::on_pushButtonVerifyEEPROM_clicked()
+{
+    if (QFile::exists(ui->lineEditEEPROMHex->text())){
+        logMessage(tr("Verfying the EEPROM memory"));
+        avrProgrammer->verifyEEPROM(ui->lineEditEEPROMHex->text());
+    } else {
+        logMessage(tr("Cannot verify because the etalon hex file does not exists"));
+    }
+}
+
+void MainWindow::on_pushButtonReadReadEEPROM_clicked()
+{
+    if (QFile::exists(ui->lineEditEEPROMHex->text())) {
+        QMessageBox exists(QMessageBox::Warning	,
+                           tr("File already exists!"),
+                           tr("The output file is already exists.\nThe reading will overwrite it.\nAre you sure?"),
+                            (QMessageBox::Yes | QMessageBox::No));
+        if (exists.exec() == QMessageBox::Yes) {
+            logMessage(tr("Reading the EEPROM memory"));
+            avrProgrammer->readEEPROM(ui->lineEditEEPROMHex->text());
+        }
+    } else {
+        logMessage(tr("Reading the EEPROM memory"));
+        avrProgrammer->readEEPROM(ui->lineEditEEPROMHex->text());
+    }
+}
+
+void MainWindow::on_textEditMessages_anchorClicked(QUrl link)
+{
+    if (link.toString() == "tab_dudeout") {
+        ui->tabWidgetMain->setCurrentWidget(ui->tabAVRDudeOutput);
+    }
 }

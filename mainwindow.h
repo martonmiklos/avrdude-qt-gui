@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMenu>
 #include <QFile>
+#include <QUrl>
 
 #include "avrprogrammer.h"
 #include "settings.h"
@@ -49,6 +50,10 @@ private:
     void fillDefaultTabComboBox();
 
 private slots:
+    void on_textEditMessages_anchorClicked(QUrl );
+    void on_pushButtonReadReadEEPROM_clicked();
+    void on_pushButtonVerifyEEPROM_clicked();
+    void on_pushButtonProgramEEPROM_clicked();
     void on_comboBoxDefaultTab_activated(int index);
     void on_comboBoxDefaultTab_currentIndexChanged(int index);
     void on_checkBoxLastTabRemember_toggled(bool checked);
@@ -79,6 +84,7 @@ private slots:
     void avrDudeOut(QString str);
     void signatureRead(quint8 s0, quint8 s1, quint8 s2);
     void logMessage(QString msg);
+    void logError(QString msg);
     void reloadFuseView();
     void progressStep();
     void verifyFailed(QString what, int offset, int value_read, int value_waited);
