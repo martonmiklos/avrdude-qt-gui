@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>edit-clear.svg</file>
+        <file>gconf-editor.svg</file>
+        <file>gtk-info.svg</file>
+        <file>locked.svg</file>
+        <file>utilities-terminal.svg</file>
+        <file>edit-delete.svg</file>
+        <file>preferences-system.svg</file>
+        <file>fuse-64.png</file>
+        <file>read_avr.svg</file>
+        <file>write_avr.svg</file>
+        <file>avr.svg</file>
+        <file>Usb-svg.svg</file>
+        <file>help-about.svg</file>
+        <file>Qt-logo.svg_.png</file>
+    </qresource>
+</RCC>
