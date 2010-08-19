@@ -19,6 +19,9 @@ public:
     QString partName;
     QString flashHexFile;
     QString eepromHexFile;
+    bool rememberLastTab;
+    int defaultTabIndex;
+    int lastTabIndex;
 private:
     QSettings *settingsIni;
 signals:

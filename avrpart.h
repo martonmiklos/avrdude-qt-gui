@@ -49,7 +49,5 @@ signals:
 public slots:
 
 };
-#include "dudepartnos.h"
-
 
 #endif // AVRPART_H

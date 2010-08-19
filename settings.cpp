@@ -25,6 +25,12 @@ Settings::Settings(QObject *parent) :
     eepromHexFile = settingsIni->value("eepromHexFile").toString();
     settingsIni->endGroup();
 
+    settingsIni->beginGroup("gui");
+    rememberLastTab = settingsIni->value("rememberLastTab", true).toBool();
+    defaultTabIndex = settingsIni->value("defaultTabIndex", 0).toInt();
+    lastTabIndex = settingsIni->value("lastTabIndex", 0).toInt();
+    settingsIni->endGroup();
+
     settingsIni->beginGroup("programmerOptions");
     particularProgOptions = settingsIni->value("particularProgOptions", false).toBool();
     programmerOptions = settingsIni->value("programmerOptions", "-c stk500 -P /dev/ttyUSB0").toString();
@@ -45,6 +51,12 @@ Settings::~Settings()
     settingsIni->setValue("xmlsPath", xmlsPath);
     settingsIni->setValue("flashHexFile", flashHexFile);
     settingsIni->setValue("eepromHexFile", eepromHexFile);
+    settingsIni->endGroup();
+
+    settingsIni->beginGroup("gui");
+    settingsIni->setValue("rememberLastTab", rememberLastTab);
+    settingsIni->setValue("defaultTabIndex", defaultTabIndex);
+    settingsIni->setValue("lastTabIndex", lastTabIndex);
     settingsIni->endGroup();
 
     settingsIni->beginGroup("programmerOptions");
