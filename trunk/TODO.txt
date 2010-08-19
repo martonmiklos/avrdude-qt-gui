@@ -1,0 +1,20 @@
+Working:
+Reading the flash memory
+Writing the flash memory
+Verifying the flash  memory
+
+
+Programmer related tasks
+- Easy programmer and port choosing
+
+Basic programming tasks:
+- Read HEX file
+- Write HEX file
+- Verify HEX file
+- Erase device
+- Get device signature
+
+FUSE related tasks:
+- Read write raw FUSE bits
+- Easy gui to modify fuses
+
