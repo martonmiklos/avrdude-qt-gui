@@ -35,17 +35,20 @@ void AvrProgrammer::readyReadDudeOutPut()
 {
     QByteArray outPut = avrDudeProcess->readAllStandardOutput();
     emit avrDudeOut(outPut);
-    if ((currentDudeTask == DudeTaskReadFlash) ||
-        (currentDudeTask == DudeTaskProgramFlash) ||
-        (currentDudeTask == DudeTaskVerifyFlash)) {
+    if ((currentDudeTask == DudeTaskReadFlash)      ||
+        (currentDudeTask == DudeTaskWriteFlash)     ||
+        (currentDudeTask == DudeTaskVerifyFlash)    ||
+        (currentDudeTask == DudeTaskReadEEPROM)     ||
+        (currentDudeTask == DudeTaskWriteEEPROM)    ||
+        (currentDudeTask == DudeTaskVerifyEEPROM)) {
         if ((outPut.size() == 1) && (outPut[0] == '#')) {
             emit progressStep();
         }
     }
 
-    if (currentDudeTask == DudeTaskVerifyFlash) {
+    if ((currentDudeTask == DudeTaskVerifyFlash) ||
+        (currentDudeTask == DudeTaskVerifyEEPROM)) {
         if (outPut.contains("first mismatch at byte")) {
-            bool ok = false;
             int offset, readVal, fileVal;
             bool success = false;
             int numEnd = 0;
@@ -58,7 +61,10 @@ void AvrProgrammer::readyReadDudeOutPut()
                 return;
             outPut = outPut.mid(numEnd);
             fileVal = getFirstHexNumberFromStr(outPut, success, numEnd);
-            emit verifyMismatch("flash", offset, readVal, fileVal);
+            if (currentDudeTask == DudeTaskVerifyEEPROM)
+                emit verifyMismatch("EEPROM", offset, readVal, fileVal);
+            else if (currentDudeTask == DudeTaskVerifyFlash)
+                emit verifyMismatch("flash", offset, readVal, fileVal);
         }
     }
 }
@@ -108,24 +114,24 @@ void AvrProgrammer::dudeFinished(int retcode)
         if (!retcode) {
             emit taskFinishedOk("Reading the program memory was successful.");
         } else {
-            emit taskFinishedOk(QString(tr("Flash reading failed: avrdude retcode: %1.\n"
-                                        "Check the AVRDude output tab for details")).arg(retcode));
+            emit taskFailed(QString(tr("Flash reading failed: avrdude retcode: %1.\n"
+                                       "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
         }
         break;
-    case DudeTaskProgramFlash:
+    case DudeTaskWriteFlash:
         if (!retcode) {
             emit taskFinishedOk("Programming the flash memory was successful.");
         } else {
-            emit taskFinishedOk(QString(tr("Flash writing failed: avrdude retcode: %1.\n"
-                                        "Check the AVRDude output tab for details")).arg(retcode));
+            emit taskFailed(QString(tr("Flash writing failed: avrdude retcode: %1.<br>"
+                                        "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
         }
         break;
     case DudeTaskVerifyFlash:
         if (!retcode) {
             emit taskFinishedOk("Verification of the flash memory was successful.");
         } else {
-            emit taskFinishedOk(QString(tr("Flash writing failed: avrdude retcode: %1.\n"
-                                        "Check the AVRDude output tab for details")).arg(retcode));
+            emit taskFailed(QString(tr("Verifying the flash memory failed: avrdude retcode: %1.\n"
+                                       "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
         }
         break;
     case DudeTaskReadFuse: {
@@ -153,6 +159,14 @@ void AvrProgrammer::dudeFinished(int retcode)
                 emit taskFailed("Failed to read the fuse bits");
             }
         } break;
+    case DudeTaskVerifyEEPROM: {
+            if (!retcode) {
+                emit taskFinishedOk(tr("Verification of the EEPROM memory was successful."));
+            } else {
+                emit taskFailed(QString(tr("EEPROM verification failed: avrdude retcode: %1.\n"
+                                           "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
+            }
+        } break;
     }
     currentDudeTask = DudeTaskNone;
 }
@@ -168,7 +182,7 @@ void AvrProgrammer::eraseDevice()
 
 void AvrProgrammer::programFlash(QString hexFileName, bool verifyAfter, bool eraseBefore)
 {
-    currentDudeTask = DudeTaskProgramFlash;
+    currentDudeTask = DudeTaskWriteFlash;
     QString startString = staticProgrammerCommand();
     startString.append(" -U flash:w:"+hexFileName+":i");
     if (!verifyAfter)
@@ -193,6 +207,33 @@ void AvrProgrammer::readFlash(QString hexFileName)
     currentDudeTask = DudeTaskReadFlash;
     QString startString = staticProgrammerCommand();
     startString.append(" -U flash:r:"+hexFileName+":i");
+    avrDudeProcess->start(startString);
+    emit avrDudeOut(startString);
+}
+
+void AvrProgrammer::programEEPROM(QString hexFileName)
+{
+    currentDudeTask = DudeTaskWriteEEPROM;
+    QString startString = staticProgrammerCommand();
+    startString.append(" -U eeprom:w:"+hexFileName+":i");
+    avrDudeProcess->start(startString);
+    emit avrDudeOut(startString);
+}
+
+void AvrProgrammer::verifyEEPROM(QString hexFileName)
+{
+    currentDudeTask = DudeTaskVerifyEEPROM;
+    QString startString = staticProgrammerCommand();
+    startString.append(" -U eeprom:v:"+hexFileName+":i");
+    avrDudeProcess->start(startString);
+    emit avrDudeOut(startString);
+}
+
+void AvrProgrammer::readEEPROM(QString hexFileName)
+{
+    currentDudeTask = DudeTaskReadEEPROM;
+    QString startString = staticProgrammerCommand();
+    startString.append(" -U eeprom:r:"+hexFileName+":i");
     avrDudeProcess->start(startString);
     emit avrDudeOut(startString);
 }

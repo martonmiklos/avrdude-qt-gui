@@ -3,7 +3,8 @@ Signature reading matching.
 Reading the flash memory
 Writing the flash memory
 Verifying the flash  memory
-
+Reading the fuse bits
+Reading writing verifyin the EEPROM
 
 Programmer related tasks
 - Easy programmer and port choosing
