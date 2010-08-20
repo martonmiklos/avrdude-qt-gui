@@ -1,8 +1,8 @@
 #include "avrpart.h"
 #include <QDir>
 
-AvrPart::AvrPart(Settings *sa, FuseModel *fa, FuseValuesModel *fva, QString name, QObject *parent)
-    : fuseModel(fa), fuseValuesModel(fva), QObject(parent), settings(sa)
+AvrPart::AvrPart(Settings *sa, QString name, QObject *parent)
+    : QObject(parent), settings(sa)
 {
     fillPartNosMap();
     setPartName(name);
@@ -187,8 +187,7 @@ void AvrPart::fillPartNosMap()
 
 bool AvrPart::fillFuseModel()
 {
-    fuseModel->fuseRegs.clear(); // clear model data
-    fuseValuesModel->fuseRegs.clear();
+    fuseRegs.clear();
     try {
         domFile.setFileName(settings->xmlsPath+"/"+partNameStr+".xml");
         if (!domFile.open(QFile::ReadOnly))  {
@@ -230,7 +229,7 @@ bool AvrPart::fillFuseModel()
                         fuseRegElement.attribute("name"),
                         fuseRegElement.attribute("offset").toInt(),
                         fuseRegElement.attribute("size").toInt());
-                fuseNames << currentFuseRegister.name;
+                currentFuseRegister.value = 0;
 
                 for(int j = 0; j<registersFuseNode.childNodes().item(i).childNodes().count(); j++) {
                     QDomElement fuseBitfieldElement = registersFuseNode.childNodes().item(i).childNodes().item(j).toElement();
@@ -238,7 +237,8 @@ bool AvrPart::fillFuseModel()
 
                     FuseBitField currentBitField;
                     currentBitField.shortName = fuseBitfieldElement.attribute("name");
-                    currentBitField.mask = fuseBitfieldElement.attribute("mask").toInt();
+                    bool ok;
+                    currentBitField.mask = fuseBitfieldElement.attribute("mask").toInt(&ok, 16);
                     currentBitField.text = fuseBitfieldElement.attribute("text");
                     currentBitField.isEnum = false;
                     if (enumName != "") {
@@ -263,11 +263,8 @@ bool AvrPart::fillFuseModel()
                     }
                     currentFuseRegister.bitFields.append(currentBitField);
                 }
-                fuseModel->fuseRegs.append(currentFuseRegister);
-                fuseValuesModel->fuseRegs.append(currentFuseRegister);
+                fuseRegs.append(currentFuseRegister);
             }
-            fuseModel->reloadModel();
-            fuseValuesModel->reloadModel();
             emit reloadFuseView();
         }
     } catch (QString ex) {
@@ -278,9 +275,10 @@ bool AvrPart::fillFuseModel()
     return true;
 }
 
-bool AvrPart::findXml(QString partName)
+bool AvrPart::findXml(QString )
 {
-
+    qWarning() << "Not yet implemented";
+    return false;
 }
 
 QString AvrPart::findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2)
@@ -329,16 +327,49 @@ QString AvrPart::findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2)
     return QString("");
 }
 
+QStringList AvrPart::getSupportedFuses()
+{
+    QStringList ret;
+    foreach (FuseRegister fr, fuseRegs) {
+        ret.append(fr.name);
+    }
+    return ret;
+}
+
+QString AvrPart::getFuseRegisterBitName(QString fuseReg, int bitnum)
+{
+    for (int i = 0; i<fuseRegs.size(); i++) {
+        if (fuseRegs[i].name == fuseReg) {
+            return getFuseRegisterBitName(i, bitnum);
+        }
+    }
+    return "";
+}
+
+QString AvrPart::getFuseRegisterBitName(int fuseRegNum, int bitnum)
+{
+    foreach (FuseBitField fb, fuseRegs[fuseRegNum].bitFields) {
+        if ((fb.mask) & (1<<bitnum)) {
+            QString ret = fb.shortName+QString::number(bitnum);
+            return ret;
+        }
+    }
+    return "";
+}
+
 void AvrPart::fusesReaded(QMap<QString, quint8> fuseValues)
 {
     QMapIterator<QString, quint8> i(fuseValues);
     while (i.hasNext()) {
         i.next();
-        fuseModel->setFuseValue(i.key(), i.value());
-        fuseValuesModel->setFuseValue(i.key(), i.value());
+        for(int j = 0; j< fuseRegs.size(); j++) {
+            if (fuseRegs[j].name == i.key()) {
+                fuseRegs[j].value = i.value();
+                qWarning() << i.key() << i.value();
+                break;
+            }
+        }
     }
-    fuseModel->reloadModel();
-    fuseValuesModel->reloadModel();
     emit reloadFuseView();
 }
 

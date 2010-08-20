@@ -52,6 +52,7 @@ private:
     void fillDefaultTabComboBox();
 
 private slots:
+    void on_comboBoxFuseDisplaymode_activated(int index);
     void on_textEditMessages_anchorClicked(QUrl );
     void on_pushButtonReadReadEEPROM_clicked();
     void on_pushButtonVerifyEEPROM_clicked();

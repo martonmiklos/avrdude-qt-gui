@@ -10,6 +10,8 @@
 #include "settings.h"
 #include "fusemodel.h"
 
+class FuseRegister;
+
 class AvrPart : public QObject
 {
     Q_OBJECT
@@ -27,12 +29,9 @@ private:
     bool findXml(QString);
     QMap<QString, QString> dudePartNos;
     Settings *settings;
-    FuseModel *fuseModel;
-    FuseValuesModel *fuseValuesModel;
-    QStringList fuseNames;
 
 public:
-    AvrPart(Settings *sa, FuseModel *fa, FuseValuesModel *fva, QString name, QObject *parent = 0);
+    AvrPart(Settings *sa, QString name, QObject *parent = 0);
     QString getPartName() const {return partNameStr;}
     bool setPartName(QString pn);
     QString getSignature() const;
@@ -40,7 +39,10 @@ public:
     QString getAvrDudePartNo(QString name) const;
     quint8 sign0, sign1, sign2; // signature bytes
     QString findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2);
-    QStringList getSupportedFuses()  {return fuseModel->getFuseNames();}
+    QStringList getSupportedFuses();
+    QList <FuseRegister> fuseRegs;
+    QString getFuseRegisterBitName(QString fuseReg, int bitnum);
+    QString getFuseRegisterBitName(int fuseReg, int bitnum);
 
 signals:
     void reloadFuseView();

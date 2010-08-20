@@ -4,7 +4,7 @@
 #include <QStringList>
 #include <QString>
 AvrProgrammer::AvrProgrammer(Settings *sa, QObject *parent)
-    : settings(sa), QObject(parent)
+    : QObject(parent), settings(sa)
 {
     if (friendlyName.isEmpty())
         friendlyName = avrDudeName;
@@ -21,7 +21,7 @@ void AvrProgrammer::readSignature()
 {
     currentDudeTask = DudeTaskReadSignature;
     QString startString = staticProgrammerCommand();
-    startString.append(" -U signature:r:"+signatureFile->fileName()+":h");
+    startString.append(" -F -U signature:r:"+signatureFile->fileName()+":h");
     signatureFile->open(QFile::WriteOnly);
     signatureFile->seek(0);
     signatureFile->close();
@@ -155,6 +155,15 @@ void AvrProgrammer::dudeFinished(int retcode)
                 emit taskFailed("Failed to read the fuse bits");
             }
         } break;
+    case DudeTaskWriteFuse: {
+
+        } break;
+    case DudeTaskVerifyFuse: {
+
+        } break;
+    case DudeTaskReadEEPROM: {
+
+        } break;
     case DudeTaskVerifyEEPROM: {
             if (!retcode) {
                 emit taskFinishedOk(tr("Verification of the EEPROM memory was successful."));
@@ -162,6 +171,12 @@ void AvrProgrammer::dudeFinished(int retcode)
                 emit taskFailed(QString(tr("EEPROM verification failed: avrdude retcode: %1.\n"
                                            "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
             }
+        } break;
+    case DudeTaskWriteEEPROM: {
+
+        } break;
+    case DudeTaskNone: {
+
         } break;
     }
     currentDudeTask = DudeTaskNone;
@@ -326,5 +341,6 @@ int AvrProgrammer::getFirstHexNumberFromStr(QString str, bool &success, int &num
             return -1;
         }
     }
+    return -1;
 }
 

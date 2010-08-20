@@ -39,20 +39,16 @@ MainWindow::MainWindow(QWidget *parent) :
     calculateArgumentsLabelText();
     fillDefaultTabComboBox();
 
-    fuseModel = new FuseModel(this);
-    fuseValuesModel = new FuseValuesModel(this);
 
-    avrPart = new AvrPart(settings, fuseModel, fuseValuesModel, ui->comboBoxDevice->currentText(), this);
+    avrPart = new AvrPart(settings, ui->comboBoxDevice->currentText(), this);
+
+    fuseModel = new FuseModel(avrPart, this);
+    fuseValuesModel = new FuseValuesModel(avrPart, this);
 
     // the avrpart object fills the fuseModel
-    ui->tableViewFuses->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
-    ui->tableViewFuses->horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
     ui->tableViewFuses->setEditTriggers(QTableView::QAbstractItemView::CurrentChanged);
     ui->tableViewFuses->setModel(fuseModel);
 
-    ui->tableViewFuseSum->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
-    ui->tableViewFuseSum->horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
-    ui->tableViewFuseSum->horizontalHeader()->setStretchLastSection(true);
     ui->tableViewFuseSum->setModel(fuseValuesModel);
 
     fuseDelegate = new FuseDelegate(this);
@@ -427,7 +423,7 @@ void MainWindow::signatureRead(quint8 s0, quint8 s1, quint8 s2)
             QString partIs = avrPart->findDeviceWithSignature(s0, s1, s2);
             if (!partIs.isEmpty()) {
                 QMessageBox okBox;
-                okBox.setWindowTitle("Found part");
+                okBox.setWindowTitle("Part found");
                 okBox.setText(QString("The part is seems to be %1\n"
                                       "Change the current device to it?").arg(partIs));
                 okBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -634,4 +630,9 @@ void MainWindow::on_textEditMessages_anchorClicked(QUrl link)
     if (link.toString() == "tab_dudeout") {
         ui->tabWidgetMain->setCurrentWidget(ui->tabAVRDudeOutput);
     }
+}
+
+void MainWindow::on_comboBoxFuseDisplaymode_activated(int index)
+{
+    fuseValuesModel->setDisplayMode((FuseBitDisplayMode) index);
 }

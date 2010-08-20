@@ -28,4 +28,6 @@ public slots:
 
 };
 
+
+
 #endif // FUSEDELEGATE_H
