@@ -21,26 +21,6 @@ void FuseModel::reloadModel()
     reset();
 }
 
-bool FuseModel::setFuseValue(QString fuseName, quint8 value)
-{
-    foreach (FuseRegister fr, fuseRegs) {
-        if (fr.name == fuseName) {
-            fr.value = value;
-            return true;
-        }
-    }
-    return false;
-}
-
-QStringList FuseModel::getFuseNames()
-{
-    QStringList ret;
-    foreach (FuseRegister fr, fuseRegs) {
-        ret.append(fr.name);
-    }
-    return ret;
-}
-
 Qt::ItemFlags FuseModel::flags(const QModelIndex &index) const
 {
     if (index.column() == 1) {
@@ -52,29 +32,29 @@ Qt::ItemFlags FuseModel::flags(const QModelIndex &index) const
 QVariant FuseModel::data(const QModelIndex &index, int role) const
 {
     int rowCounter = 0;
-    for (int i = 0; i<fuseRegs.count(); i++) {
-        for (int j = 0; j<fuseRegs[i].bitFields.count(); j++) {
+    for (int i = 0; i<part->fuseRegs.count(); i++) {
+        for (int j = 0; j<part->fuseRegs[i].bitFields.count(); j++) {
             if (rowCounter == index.row()) {
                 switch (index.column()) {
                 case 0: { // fuse name
                         switch(role) {
-                            case Qt::DisplayRole: return fuseRegs[i].bitFields[j].shortName; break;
-                            case Qt::ToolTipRole: return fuseRegs[i].bitFields[j].text; break;
+                            case Qt::DisplayRole: return part->fuseRegs[i].bitFields[j].shortName; break;
+                            case Qt::ToolTipRole: return part->fuseRegs[i].bitFields[j].text; break;
                         }; // switch role
                     } break; // column 0
                 case 1: { // fuse value
                         if (role == Qt::UserRole) {
                             FuseBitField ret;
-                            if (fuseRegs[i].bitFields[j].enumValues.isEmpty()) {
+                            if (part->fuseRegs[i].bitFields[j].enumValues.isEmpty()) {
                                 ret.isEnum = false;
                                 return QVariant::fromValue(ret);
                             } else {
                                 ret.isEnum = true;
-                                ret.enumValues = fuseRegs[i].bitFields[j].enumValues;
+                                ret.enumValues = part->fuseRegs[i].bitFields[j].enumValues;
                                 return QVariant::fromValue(ret);
                             }
                         } else if (role ==  Qt::DisplayRole) {
-                            return fuseRegs[i].bitFields[j].value;
+                            return part->fuseRegs[i].bitFields[j].value;
                         }
                     } break; // column 1
                 } // switch index
@@ -82,7 +62,7 @@ QVariant FuseModel::data(const QModelIndex &index, int role) const
             } // we have found the searched bitfield
             rowCounter++;
         } // this loops on the fuses bitfields
-    } // this cycle loops on the (HIGH LOW EXTENDED FUSE) fuseregs
+    } // this cycle loops on the (HIGH LOW EXTENDED FUSE) part->fuseRegs
     return QVariant();
 }
 
@@ -91,15 +71,15 @@ bool FuseModel::setData(const QModelIndex &index, const QVariant &value, int rol
     int rowCounter = 0;
     if ((role == Qt::DisplayRole)  || (role == Qt::EditRole)) {
         if (index.column() == 1) { //is the index points to the fuse value column?
-            for (int i = 0; i<fuseRegs.count(); i++) {// this cycle loops on the (HIGH LOW EXTENDED FUSE) fuseregs
-                for (int j = 0; j<fuseRegs[i].bitFields.count(); j++) { // this loops on the fuses bitfields
+            for (int i = 0; i<part->fuseRegs.count(); i++) {// this cycle loops on the (HIGH LOW EXTENDED FUSE) part->fuseRegs
+                for (int j = 0; j<part->fuseRegs[i].bitFields.count(); j++) { // this loops on the fuses bitfields
                     if (rowCounter == index.row()) {
-                        fuseRegs[i].bitFields[j].value = value.toInt();
+                        part->fuseRegs[i].bitFields[j].value = value.toInt();
                         return true;
                     } // we have found the searched bitfield
                     rowCounter++;
                 } // this loops on the fuses bitfields
-            } // this cycle loops on the (HIGH LOW EXTENDED FUSE) fuseregs
+            } // this cycle loops on the (HIGH LOW EXTENDED FUSE) part->fuseRegs
         }
     }
     return false;
@@ -110,8 +90,8 @@ int FuseModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
     int rowCount = 0;
-    for (int i = 0; i<fuseRegs.count(); i++) {
-        rowCount += fuseRegs[i].bitFields.count();
+    for (int i = 0; i<part->fuseRegs.count(); i++) {
+        rowCount += part->fuseRegs[i].bitFields.count();
     }
     return rowCount;
 }
@@ -128,25 +108,44 @@ int FuseValuesModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
 
-    return fuseRegs.size();
+    if (currentMode == FuseBitDisplayMode_BinaryDetailed)
+        return part->fuseRegs.size()*2;
+    return part->fuseRegs.size();
 }
 
 int FuseValuesModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
+
+    if (currentMode == FuseBitDisplayMode_BinaryDetailed)
+        return 9;
     return 2;
 }
 
 QVariant FuseValuesModel::data(const QModelIndex &index, int role) const
 {
-    if (index.row() < fuseRegs.size()) {
-        if ((index.column() == 0) && (role == Qt::DisplayRole)) {
-            return fuseRegs[index.row()].name;
+    if (currentMode == FuseBitDisplayMode_BinaryDetailed) {
+        if (index.row()%2 ==  1) { // value row
+            if ((index.column() == 0) && (role == Qt::DisplayRole)) {
+                return part->fuseRegs[(index.row() - 1)/2].name;
+            } else {
+                return (bool)(part->fuseRegs[(index.row() - 1)/2].value & (1<<(index.column()-1)));
+            }
+        } else { // bits name row
+            if (((index.column() > 0) && (index.column() < 9)) && (role == Qt::DisplayRole)) {
+                return part->getFuseRegisterBitName((index.row())/2, index.column()-1);
+            }
         }
+    } else {
+        if (index.row() < part->fuseRegs.size()) {
+            if ((index.column() == 0) && (role == Qt::DisplayRole)) {
+                return part->fuseRegs[index.row()].name;
+            }
 
-        if ((index.column() == 1) && (role == Qt::DisplayRole)) {
-            return fuseRegs[index.row()].value;
+            if ((index.column() == 1) && (role == Qt::DisplayRole)) {
+                return part->fuseRegs[index.row()].value;
+            }
         }
     }
     return QVariant();
@@ -154,9 +153,9 @@ QVariant FuseValuesModel::data(const QModelIndex &index, int role) const
 
 bool FuseValuesModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (index.row() < fuseRegs.size()) {
-        if (index.column() == 1) {
-            fuseRegs[index.row()].value = value.toInt();
+    if (index.row() < part->fuseRegs.size()) {
+        if ((index.column() == 1) && (role == Qt::DisplayRole)){
+            part->fuseRegs[index.row()].value = value.toInt();
             return true;
         }
     }
@@ -180,25 +179,32 @@ QVariant FuseValuesModel::headerData(int section, Qt::Orientation orientation, i
 
 Qt::ItemFlags FuseValuesModel::flags(const QModelIndex &index) const
 {
-    if (index.column() == 1) {
-        return Qt::ItemIsEditable | Qt::ItemIsEnabled;
+    if (currentMode == FuseBitDisplayMode_BinaryDetailed) {
+        if (index.row() %2 == 0) {
+            return Qt::ItemIsEnabled;
+        } else {
+            if (index.column() > 0)
+                return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
+        }
+    } else {
+        if (index.column() == 1) {
+            return Qt::ItemIsEditable | Qt::ItemIsEnabled;
+        }
     }
     return Qt::ItemIsEnabled;
 }
+
 void FuseValuesModel::reloadModel()
 {
     reset();
 }
 
-bool FuseValuesModel::setFuseValue(QString fuseName, quint8 value)
+void FuseValuesModel::setDisplayMode(FuseBitDisplayMode mode)
 {
-    for(int i = 0; i< fuseRegs.size(); i++) {
-        if (fuseRegs[i].name == fuseName) {
-            fuseRegs[i].value = value;
-            qWarning() << fuseName << value;
-            emit dataChanged(this->index(i, 1), this->index(i,1));
-            return true;
-        }
+    currentMode = mode;
+    if (mode == FuseBitDisplayMode_BinaryDetailed) {
+        emit dataChanged(this->index(0,0), this->index(part->fuseRegs.size()*2, 9));
     }
-    return false;
+    this->reset();
 }
+

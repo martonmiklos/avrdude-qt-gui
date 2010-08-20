@@ -5,7 +5,18 @@
 #include <QMap>
 #include <QStringList>
 
-class FuseBitField
+#include "avrpart.h"
+
+class AvrPart;
+
+typedef enum {
+    FuseBitDisplayMode_Decimal,
+    FuseBitDisplayMode_Hexadecimal,
+    FuseBitDisplayMode_Binary,
+    FuseBitDisplayMode_BinaryDetailed
+} FuseBitDisplayMode;
+
+class FuseBitField // represent a
 {
 public:
     FuseBitField(){}
@@ -33,8 +44,8 @@ class FuseModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit FuseModel(QObject *parent = 0) : QAbstractTableModel(parent) {}
-    QList<FuseRegister> fuseRegs;
+    FuseModel(AvrPart *pa, QObject *parent = 0) : QAbstractTableModel(parent), part(pa) {}
+    AvrPart *part;
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -42,22 +53,14 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void reloadModel();
-    bool setFuseValue(QString fuseName, quint8 value);
-    QStringList getFuseNames();
-
-signals:
-
-public slots:
-
 };
 
 class FuseValuesModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit FuseValuesModel(QObject *parent = 0) : QAbstractTableModel(parent) {}
-    QList<FuseRegister> fuseRegs;
-
+    FuseValuesModel(AvrPart *pa, QObject *parent = 0) : QAbstractTableModel(parent), part(pa), currentMode(FuseBitDisplayMode_Decimal) {}
+    AvrPart *part;
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -65,10 +68,11 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void reloadModel();
-signals:
+    void setDisplayMode(FuseBitDisplayMode mode);
 
-public slots:
-    bool setFuseValue(QString fuseName, quint8 value);
+private:
+    FuseBitDisplayMode currentMode;
+
 };
 
 #endif // FUSEMODEL_H

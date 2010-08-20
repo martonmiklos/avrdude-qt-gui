@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>11</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabMain">
        <attribute name="title">
@@ -314,8 +314,8 @@
        <attribute name="title">
         <string>Fuses</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_7">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_11">
+        <item row="0" column="0" colspan="2">
          <widget class="QTableView" name="tableViewFuses">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -331,7 +331,7 @@
           </attribute>
          </widget>
         </item>
-        <item>
+        <item row="3" column="0" colspan="2">
          <widget class="QTableView" name="tableViewFuseSum">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -339,21 +339,24 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
          </widget>
         </item>
-        <item>
-         <layout class="QGridLayout" name="gridLayout_8">
+        <item row="4" column="0" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="0" column="0">
+          <item>
            <widget class="QCheckBox" name="checkBox">
             <property name="text">
              <string>Auto read</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item>
            <widget class="QPushButton" name="pushButtonProgramFuses">
             <property name="text">
              <string>Program</string>
@@ -364,14 +367,14 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
+          <item>
            <widget class="QPushButton" name="pushButtonVerifyFuses">
             <property name="text">
              <string>Verify</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
+          <item>
            <widget class="QPushButton" name="pushButtonReadFuses">
             <property name="text">
              <string>Read</string>
@@ -383,6 +386,37 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="labelFuseBiDisplaymode">
+          <property name="text">
+           <string>Fuse value display:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="comboBoxFuseDisplaymode">
+          <item>
+           <property name="text">
+            <string>Decimal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Hexadecimal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Binary</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Binary detailed</string>
+           </property>
+          </item>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -709,6 +743,7 @@ p, li { white-space: pre-wrap; }
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
