@@ -44,6 +44,8 @@ private:
     FuseModel *fuseModel;
     FuseDelegate *fuseDelegate;
 
+    FuseValuesModel *fuseValuesModel;
+
     void fillDeviceList();
     void fillProgrammersList();
     void calculateArgumentsLabelText();
@@ -55,7 +57,6 @@ private slots:
     void on_pushButtonVerifyEEPROM_clicked();
     void on_pushButtonProgramEEPROM_clicked();
     void on_comboBoxDefaultTab_activated(int index);
-    void on_comboBoxDefaultTab_currentIndexChanged(int index);
     void on_checkBoxLastTabRemember_toggled(bool checked);
     void on_pushButton_2_clicked();
     void on_pushButtonReadFuses_clicked();

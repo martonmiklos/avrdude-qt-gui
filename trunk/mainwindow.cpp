@@ -40,15 +40,21 @@ MainWindow::MainWindow(QWidget *parent) :
     fillDefaultTabComboBox();
 
     fuseModel = new FuseModel(this);
+    fuseValuesModel = new FuseValuesModel(this);
 
-    avrPart = new AvrPart(settings, fuseModel, this);
-    avrPart->init(ui->comboBoxDevice->currentText());
+    avrPart = new AvrPart(settings, fuseModel, fuseValuesModel, ui->comboBoxDevice->currentText(), this);
 
     // the avrpart object fills the fuseModel
     ui->tableViewFuses->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
     ui->tableViewFuses->horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
     ui->tableViewFuses->setEditTriggers(QTableView::QAbstractItemView::CurrentChanged);
     ui->tableViewFuses->setModel(fuseModel);
+
+    ui->tableViewFuseSum->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
+    ui->tableViewFuseSum->horizontalHeader()->setResizeMode(1, QHeaderView::Stretch);
+    ui->tableViewFuseSum->horizontalHeader()->setStretchLastSection(true);
+    ui->tableViewFuseSum->setModel(fuseValuesModel);
+
     fuseDelegate = new FuseDelegate(this);
     ui->tableViewFuses->setItemDelegateForColumn(1, fuseDelegate);
     connect(avrPart, SIGNAL(reloadFuseView()), this, SLOT(reloadFuseView()));
@@ -65,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(avrProgrammer, SIGNAL(taskFinishedOk(QString)), this,SLOT(logMessage(QString)));
     connect(avrProgrammer, SIGNAL(progressStep()), this, SLOT(progressStep())); // this will output nice dots to the messages view during the long operations
     connect(avrProgrammer, SIGNAL(verifyMismatch(QString,int,int,int)), this, SLOT(verifyFailed(QString,int,int,int)));
+    connect(avrProgrammer, SIGNAL(fusesReaded(QMap<QString,quint8>)), avrPart, SLOT(fusesReaded(QMap<QString,quint8>)));
 
     ui->checkBoxLastTabRemember->setChecked(settings->rememberLastTab);
     if (settings->rememberLastTab == true) {
@@ -566,7 +573,7 @@ void MainWindow::on_pushButtonProgramFuses_clicked()
 void MainWindow::on_pushButtonReadFuses_clicked()
 {
     logMessage("Reading fuse bits");
-    avrProgrammer->readFuse();
+    avrProgrammer->readFuses(avrPart->getSupportedFuses());
 }
 
 void MainWindow::on_pushButton_2_clicked()
@@ -578,10 +585,6 @@ void MainWindow::on_checkBoxLastTabRemember_toggled(bool checked)
 {
     settings->rememberLastTab = checked;
     ui->comboBoxDefaultTab->setEnabled(!checked);
-}
-
-void MainWindow::on_comboBoxDefaultTab_currentIndexChanged(int index)
-{
 }
 
 void MainWindow::on_comboBoxDefaultTab_activated(int index)

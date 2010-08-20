@@ -1,11 +1,6 @@
 #include "fusemodel.h"
 #include <QDebug>
 
-FuseModel::FuseModel(QObject *parent) :
-    QAbstractTableModel(parent)
-{
-}
-
 QVariant FuseModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
@@ -24,6 +19,26 @@ QVariant FuseModel::headerData(int section, Qt::Orientation orientation, int rol
 void FuseModel::reloadModel()
 {
     reset();
+}
+
+bool FuseModel::setFuseValue(QString fuseName, quint8 value)
+{
+    foreach (FuseRegister fr, fuseRegs) {
+        if (fr.name == fuseName) {
+            fr.value = value;
+            return true;
+        }
+    }
+    return false;
+}
+
+QStringList FuseModel::getFuseNames()
+{
+    QStringList ret;
+    foreach (FuseRegister fr, fuseRegs) {
+        ret.append(fr.name);
+    }
+    return ret;
 }
 
 Qt::ItemFlags FuseModel::flags(const QModelIndex &index) const
@@ -108,3 +123,82 @@ int FuseModel::columnCount(const QModelIndex &parent) const
     return 2;
 }
 
+int FuseValuesModel::rowCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+
+    return fuseRegs.size();
+}
+
+int FuseValuesModel::columnCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    return 2;
+}
+
+QVariant FuseValuesModel::data(const QModelIndex &index, int role) const
+{
+    if (index.row() < fuseRegs.size()) {
+        if ((index.column() == 0) && (role == Qt::DisplayRole)) {
+            return fuseRegs[index.row()].name;
+        }
+
+        if ((index.column() == 1) && (role == Qt::DisplayRole)) {
+            return fuseRegs[index.row()].value;
+        }
+    }
+    return QVariant();
+}
+
+bool FuseValuesModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (index.row() < fuseRegs.size()) {
+        if (index.column() == 1) {
+            fuseRegs[index.row()].value = value.toInt();
+            return true;
+        }
+    }
+    return false;
+}
+
+QVariant FuseValuesModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole)
+        return QVariant();
+
+    if (orientation == Qt::Horizontal) {
+        if (section == 0)
+            return tr("Name");
+        else
+            return tr("Value");
+    } else {
+        return section;
+    }
+}
+
+Qt::ItemFlags FuseValuesModel::flags(const QModelIndex &index) const
+{
+    if (index.column() == 1) {
+        return Qt::ItemIsEditable | Qt::ItemIsEnabled;
+    }
+    return Qt::ItemIsEnabled;
+}
+void FuseValuesModel::reloadModel()
+{
+    reset();
+}
+
+bool FuseValuesModel::setFuseValue(QString fuseName, quint8 value)
+{
+    for(int i = 0; i< fuseRegs.size(); i++) {
+        if (fuseRegs[i].name == fuseName) {
+            fuseRegs[i].value = value;
+            qWarning() << fuseName << value;
+            emit dataChanged(this->index(i, 1), this->index(i,1));
+            return true;
+        }
+    }
+    return false;
+}

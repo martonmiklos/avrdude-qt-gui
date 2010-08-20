@@ -1,16 +1,11 @@
 #include "avrpart.h"
 #include <QDir>
 
-AvrPart::AvrPart(Settings *sa, FuseModel *fa, QObject *parent) :
-    QObject(parent), settings(sa), fuseModel(fa)
+AvrPart::AvrPart(Settings *sa, FuseModel *fa, FuseValuesModel *fva, QString name, QObject *parent)
+    : fuseModel(fa), fuseValuesModel(fva), QObject(parent), settings(sa)
 {
     fillPartNosMap();
-}
-
-AvrPart::AvrPart(Settings *sa, FuseModel *fa, QString name, QObject *parent)
-{
-    AvrPart::AvrPart(sa, fa, parent);
-    init(name);
+    setPartName(name);
 }
 
 
@@ -79,20 +74,6 @@ bool AvrPart::setPartName(QString name)
         partNameStr = tr("Invalid xml file");
         return false;
     }
-}
-
-bool AvrPart::init(QString pn)
-{
-    try {
-        if (!setPartName(pn))
-            throw false;
-
-        if (!fillFuseModel())
-            throw false;
-    } catch (bool a) {
-        return a;
-    }
-    return true;
 }
 
 QString AvrPart::getAvrDudePartNo(QString name) const
@@ -207,6 +188,7 @@ void AvrPart::fillPartNosMap()
 bool AvrPart::fillFuseModel()
 {
     fuseModel->fuseRegs.clear(); // clear model data
+    fuseValuesModel->fuseRegs.clear();
     try {
         domFile.setFileName(settings->xmlsPath+"/"+partNameStr+".xml");
         if (!domFile.open(QFile::ReadOnly))  {
@@ -221,10 +203,14 @@ bool AvrPart::fillFuseModel()
 
         QDomNode registersFuseNode;
         bool regFuseFound = false;
-        QDomNodeList list =  domDoc.elementsByTagName("registers");
+        QDomNodeList v2List = domDoc.elementsByTagName("V2");
+        if (v2List.size() == 0) {
+            throw (tr("Could not find the V2 tag in the xml file. Maybe you should update it to a newer one."));
+        }
+
+        QDomNodeList list =  v2List.at(0).toElement().elementsByTagName("registers");
         for (int i = 0; i<list.size() ;i++){
-            if (/*(list.item(i).toElement().attribute("name") == "FUSE")  &&*/
-                (list.item(i).toElement().attribute("memspace") == "FUSE")){
+            if (list.item(i).toElement().attribute("memspace") == "FUSE"){
                 regFuseFound = true;
                 registersFuseNode = list.item(i);
                 break;
@@ -234,7 +220,7 @@ bool AvrPart::fillFuseModel()
         if (!regFuseFound) {
             throw QString("Cannot found the FUSE module key");
         } else {
-            // this will iterate on the High low, extended fuses or on fuse[N] keys
+            // this will iterate on the High low, extended fuses or on fuse[N] keys at xmega devices
             for(int i = 0; i<registersFuseNode.childNodes().count(); i++) {
                 QDomElement fuseRegElement = registersFuseNode.childNodes().item(i).toElement();
                 if (fuseRegElement.attribute("name").toAscii() == "")
@@ -244,10 +230,10 @@ bool AvrPart::fillFuseModel()
                         fuseRegElement.attribute("name"),
                         fuseRegElement.attribute("offset").toInt(),
                         fuseRegElement.attribute("size").toInt());
-                qWarning() << currentFuseRegister.name;
+                fuseNames << currentFuseRegister.name;
 
                 for(int j = 0; j<registersFuseNode.childNodes().item(i).childNodes().count(); j++) {
-                    QDomElement fuseBitfieldElement= registersFuseNode.childNodes().item(i).childNodes().item(j).toElement();
+                    QDomElement fuseBitfieldElement = registersFuseNode.childNodes().item(i).childNodes().item(j).toElement();
                     QString enumName = fuseBitfieldElement.attribute("enum", "");
 
                     FuseBitField currentBitField;
@@ -278,9 +264,11 @@ bool AvrPart::fillFuseModel()
                     currentFuseRegister.bitFields.append(currentBitField);
                 }
                 fuseModel->fuseRegs.append(currentFuseRegister);
-                fuseModel->reloadModel();
-                emit reloadFuseView();
+                fuseValuesModel->fuseRegs.append(currentFuseRegister);
             }
+            fuseModel->reloadModel();
+            fuseValuesModel->reloadModel();
+            emit reloadFuseView();
         }
     } catch (QString ex) {
         errorString = ex;
@@ -339,5 +327,18 @@ QString AvrPart::findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2)
         }
     }
     return QString("");
+}
+
+void AvrPart::fusesReaded(QMap<QString, quint8> fuseValues)
+{
+    QMapIterator<QString, quint8> i(fuseValues);
+    while (i.hasNext()) {
+        i.next();
+        fuseModel->setFuseValue(i.key(), i.value());
+        fuseValuesModel->setFuseValue(i.key(), i.value());
+    }
+    fuseModel->reloadModel();
+    fuseValuesModel->reloadModel();
+    emit reloadFuseView();
 }
 
