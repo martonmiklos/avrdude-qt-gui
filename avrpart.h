@@ -28,25 +28,25 @@ private:
     QMap<QString, QString> dudePartNos;
     Settings *settings;
     FuseModel *fuseModel;
-    QStringList supportedFuses;
+    FuseValuesModel *fuseValuesModel;
+    QStringList fuseNames;
 
 public:
-    AvrPart(Settings *sa, FuseModel *fa, QObject *parent = 0);
-    AvrPart(Settings *sa, FuseModel *fa, QString name, QObject *parent = 0);
+    AvrPart(Settings *sa, FuseModel *fa, FuseValuesModel *fva, QString name, QObject *parent = 0);
     QString getPartName() const {return partNameStr;}
     bool setPartName(QString pn);
-    bool init(QString pn);
     QString getSignature() const;
     QString error() const {return errorString;}
     QString getAvrDudePartNo(QString name) const;
     quint8 sign0, sign1, sign2; // signature bytes
     QString findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2);
-    QStringList getSupportedFuses() const {return supportedFuses;}
+    QStringList getSupportedFuses()  {return fuseModel->getFuseNames();}
 
 signals:
     void reloadFuseView();
 
 public slots:
+    void fusesReaded(QMap<QString, quint8> fuseValues);
 
 };
 

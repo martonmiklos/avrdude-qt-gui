@@ -55,7 +55,7 @@ public:
     void verifyEEPROM(QString hexFileName);
     void readEEPROM(QString hexFileName);
 
-    void readFuse();
+    void readFuses(QStringList fuseList);
     void writeFuse(quint8 hfuse, quint8 lfuse);
     bool isWorking() const {return currentDudeTask == DudeTaskNone;}
 
@@ -65,7 +65,7 @@ signals:
     void avrDudeOut(QString out);
     void taskFinishedOk(QString);
     void taskFailed(QString);
-    void fuseRead(quint8 h, quint8 l);
+    void fusesReaded(QMap<QString, quint8> fuses);
     void verifyMismatch(QString what, int offset, int value_read, int value_file);
 
 private:
@@ -76,10 +76,11 @@ private:
     QProcess *avrDudeProcess;
     Settings *settings;
     QFile *signatureFile;
-    QFile *hFuseFile, *lFuseFile;
-
+    QStringList fusesToRead, fuseNamesToRead;
     CurrentDudeTask currentDudeTask;
     QString staticProgrammerCommand();
+
+    QString getAvrDudeFuseNameFromXMLName(QString fuseName);
 
     int getFirstHexNumberFromStr(QString str, bool & success, int & numberEnd);
 

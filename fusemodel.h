@@ -3,6 +3,7 @@
 
 #include <QAbstractTableModel>
 #include <QMap>
+#include <QStringList>
 
 class FuseBitField
 {
@@ -32,7 +33,7 @@ class FuseModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit FuseModel(QObject *parent = 0);
+    explicit FuseModel(QObject *parent = 0) : QAbstractTableModel(parent) {}
     QList<FuseRegister> fuseRegs;
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
@@ -41,7 +42,8 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void reloadModel();
-    void setFuseValue(quint8  h, quint8 l);
+    bool setFuseValue(QString fuseName, quint8 value);
+    QStringList getFuseNames();
 
 signals:
 
@@ -49,12 +51,13 @@ public slots:
 
 };
 
-/*class FuseBitsModel : public QAbstractTableModel
+class FuseValuesModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit FuseBitsModel(QObject *parent = 0);
+    explicit FuseValuesModel(QObject *parent = 0) : QAbstractTableModel(parent) {}
     QList<FuseRegister> fuseRegs;
+
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -65,6 +68,7 @@ public:
 signals:
 
 public slots:
+    bool setFuseValue(QString fuseName, quint8 value);
 };
-*/
+
 #endif // FUSEMODEL_H

@@ -15,8 +15,6 @@ AvrProgrammer::AvrProgrammer(Settings *sa, QObject *parent)
     connect(avrDudeProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processErrorSlot(QProcess::ProcessError)));
     connect(avrDudeProcess, SIGNAL(finished(int)), this, SLOT(dudeFinished(int)));
     signatureFile = new QFile(QDir::tempPath()+"/signature.txt");
-    hFuseFile = new QFile(QDir::tempPath()+"/hfuse.txt");
-    lFuseFile = new QFile(QDir::tempPath()+"/lfuse.txt");
 }
 
 void AvrProgrammer::readSignature()
@@ -137,23 +135,21 @@ void AvrProgrammer::dudeFinished(int retcode)
     case DudeTaskReadFuse: {
             if (!retcode) {
                 bool ok = true;
-                hFuseFile->open(QFile::ReadOnly);
-                quint8 hFuse = hFuseFile->readAll().trimmed().toInt(&ok, 16);
-                hFuseFile->close();
-                if (ok == false)
-                    emit taskFailed("Unable to read the High fuse");
-
-                lFuseFile->open(QFile::ReadOnly);
-                quint8 lFuse = lFuseFile->readAll().trimmed().toInt(&ok, 16);
-                lFuseFile->close();
-                if (ok == false)
-                    emit taskFailed("Unable to read the Low fuse");
-
-                qWarning() << "fuses: H:" << hFuse << "L:" << lFuse;
+                QMap<QString, quint8> map;
+                for (int i = 0; i<fusesToRead.size(); i++)  {
+                    bool ok = false;
+                    QFile currentFuseOutFile(QDir::tempPath()+"/"+fusesToRead[i]+".txt");
+                    currentFuseOutFile.open(QFile::ReadOnly);
+                    quint8 currentFuseValue = currentFuseOutFile.readAll().trimmed().toInt(&ok, 16);
+                    currentFuseOutFile.close();
+                    if (ok == false)
+                        emit taskFailed(QString(tr("Unable to read the %1 fuse")).arg(fuseNamesToRead[i]));
+                    map[fuseNamesToRead[i]] = currentFuseValue;
+                }
 
                 if (ok) {
                     emit taskFinishedOk(QString(tr("Reading the fuse bits done")));
-                    emit fuseRead(hFuse, lFuse);
+                    emit fusesReaded(map);
                 }
             } else {
                 emit taskFailed("Failed to read the fuse bits");
@@ -238,13 +234,21 @@ void AvrProgrammer::readEEPROM(QString hexFileName)
     emit avrDudeOut(startString);
 }
 
-void AvrProgrammer::readFuse()
+void AvrProgrammer::readFuses(QStringList fuseList)
 {
+
     currentDudeTask = DudeTaskReadFuse;
-    hFuseFile->remove();
-    lFuseFile->remove();
     QString startString = staticProgrammerCommand();
-    startString.append(" -U hfuse:r:"+hFuseFile->fileName()+":h -U lfuse:r:"+lFuseFile->fileName()+":h");
+    fusesToRead.clear();
+    fuseNamesToRead = fuseList;
+    for (int i = 0; i<fuseList.size(); i++)  {
+        QString currentFuseArg = getAvrDudeFuseNameFromXMLName(fuseList[i]);
+        fusesToRead.append(currentFuseArg);
+        QFile currentFuseOutFile(QDir::tempPath()+"/"+currentFuseArg+".txt");
+        if (currentFuseOutFile.exists())
+            currentFuseOutFile.remove();
+        startString.append(" -U "+currentFuseArg+":r:"+currentFuseOutFile.fileName()+":h");
+    }
     avrDudeProcess->start(startString);
     emit avrDudeOut(startString);
 }
@@ -253,18 +257,34 @@ QString AvrProgrammer::staticProgrammerCommand()
 {
     QString ret;
     if (!settings->particularProgOptions) {
-        ret = QString("%1 -F -p %2 -c %3 -P %4")
+        ret = QString("%1 -p %2 -c %3 -P %4")
                               .arg(settings->dudePath)
                               .arg(settings->partName)
                               .arg(settings->programmerName)
                               .arg(settings->programmerPort);
     } else {
-        ret = QString("%1 -F -p %3 %2")
+        ret = QString("%1 -p %3 %2")
                       .arg(settings->dudePath)
                       .arg(settings->programmerOptions)
                       .arg(settings->partName);
     }
     return ret;
+}
+
+QString AvrProgrammer::getAvrDudeFuseNameFromXMLName(QString fuseName)
+{
+    if (fuseName.toLower() == "high")
+        return "hfuse";
+
+    if (fuseName.toLower() == "low")
+        return "lfuse";
+
+    if (fuseName.toLower() == "extended")
+        return "efuse";
+
+    // atxmega devices fuse fields are called
+    // FUSE[N] in the xml file an the avrdude need the similar argument in lower case
+    return fuseName.toLower();
 }
 
 int AvrProgrammer::getFirstHexNumberFromStr(QString str, bool &success, int &numberEnd)
