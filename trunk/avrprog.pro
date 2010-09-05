@@ -7,7 +7,6 @@
 TARGET = avrprog
 TEMPLATE = app
 QT += xml
-QT += multimedia
 OBJECTS_DIR = build
 MOC_DIR = build
 UI_DIR = build

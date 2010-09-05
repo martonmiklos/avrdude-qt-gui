@@ -58,15 +58,7 @@ void FuseDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
     if (field.isEnum) {
         QComboBox *cb = static_cast<QComboBox*>(editor);
         cb->setAutoFillBackground(true);
-        int current = 0;
-        QMapIterator<QString, int> i(field.enumValues);
-        while (i.hasNext()) {
-            i.next();
-            cb->addItem(i.key(), i.value());
-            if (field.value == i.value())
-                current = i.value();
-        }
-        cb->setCurrentIndex(current);
+        cb->setCurrentIndex(cb->findData(field.value));
     } else {
         QCheckBox *cb = static_cast<QCheckBox*>(editor);
         cb->setAutoFillBackground(true);
@@ -86,7 +78,7 @@ void FuseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     } else {
         QCheckBox *cb = static_cast<QCheckBox*>(editor);
         if (cb->isChecked())
-            value = 255;
+            value = 1;
     }
     model->setData(index, value, Qt::EditRole);
 }

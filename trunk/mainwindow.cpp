@@ -3,7 +3,6 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QtMultimedia>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -11,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     statusBarLabel = new QLabel(this);
+    statusBarLabel->setText("asd");
     ui->setupUi(this);
     ui->statusbar->addWidget(statusBarLabel);
 
@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     avrPart = new AvrPart(settings, ui->comboBoxDevice->currentText(), this);
 
-    fuseModel = new FuseModel(avrPart, this);
+    fuseModel = new FuseModelCute(avrPart, this);
     fuseValuesModel = new FuseValuesModel(avrPart, this);
 
     // the avrpart object fills the fuseModel
@@ -55,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableViewFuses->setItemDelegateForColumn(1, fuseDelegate);
     connect(avrPart, SIGNAL(reloadFuseView()), this, SLOT(reloadFuseView()));
     reloadFuseView();
-
     statusBarLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     statusBarLabel->setTextFormat(Qt::RichText);
     statusBarLabel->setText(QString("<b>%1 %2</b>").arg(avrPart->getPartName()).arg(avrPart->getSignature()));
@@ -183,6 +182,7 @@ void MainWindow::fillDefaultTabComboBox()
 
 void MainWindow::reloadFuseView()
 {
+    fuseModel->reloadModel();
     for (int i = 0; i<fuseModel->rowCount(fuseModel->index(-1,-1)) ; i++) {
         ui->tableViewFuses->openPersistentEditor(fuseModel->index(i, 1));
     }
@@ -563,6 +563,8 @@ void MainWindow::on_pushButtonReadReadFlash_clicked()
 
 void MainWindow::on_pushButtonProgramFuses_clicked()
 {
+    for (int i = 0; i< avrPart->fuseRegs.count(); i++)
+        qWarning() <<avrPart->fuseRegs.at(i).value << avrPart->fuseRegs.at(i).name;
 
 }
 

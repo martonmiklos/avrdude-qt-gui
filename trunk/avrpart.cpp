@@ -365,7 +365,21 @@ void AvrPart::fusesReaded(QMap<QString, quint8> fuseValues)
         for(int j = 0; j< fuseRegs.size(); j++) {
             if (fuseRegs[j].name == i.key()) {
                 fuseRegs[j].value = i.value();
-                qWarning() << i.key() << i.value();
+                qWarning() << i.key() << i.value() << QString::number(i.value(), 2).rightJustified(8, '0');
+                for (int k = 0; k<fuseRegs[j].bitFields.count(); k++) {
+                    if (fuseRegs[j].bitFields[k].isEnum) {
+                        fuseRegs[j].bitFields[k].value = (fuseRegs[j].value & fuseRegs[j].bitFields[k].mask);
+                        int l;
+                        for (l = 0; l<8; l++) {
+                            if (fuseRegs[j].bitFields[k].mask & (1<<l)) {
+                                break;
+                            }
+                        }
+                        fuseRegs[j].bitFields[k].value = fuseRegs[j].bitFields[k].value / (1<<l);
+                    } else {
+                        fuseRegs[j].bitFields[k].value = ((fuseRegs[j].value & fuseRegs[j].bitFields[k].mask) != 0);
+                    }
+                }
                 break;
             }
         }
