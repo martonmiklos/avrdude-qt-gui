@@ -1,7 +1,7 @@
 #include "fusemodel.h"
 #include <QDebug>
 
-QVariant FuseModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant FuseModelCute::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -16,12 +16,14 @@ QVariant FuseModel::headerData(int section, Qt::Orientation orientation, int rol
     }
 }
 
-void FuseModel::reloadModel()
+void FuseModelCute::reloadModel()
 {
-    reset();
+    this->dataChanged(this->index(1,0), this->index(1, this->rowCount(this->index(-1, -1))));
+    this->reset();
+
 }
 
-Qt::ItemFlags FuseModel::flags(const QModelIndex &index) const
+Qt::ItemFlags FuseModelCute::flags(const QModelIndex &index) const
 {
     if (index.column() == 1) {
         return Qt::ItemIsEditable | Qt::ItemIsEnabled;
@@ -29,7 +31,7 @@ Qt::ItemFlags FuseModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEnabled;
 }
 
-QVariant FuseModel::data(const QModelIndex &index, int role) const
+QVariant FuseModelCute::data(const QModelIndex &index, int role) const
 {
     int rowCounter = 0;
     for (int i = 0; i<part->fuseRegs.count(); i++) {
@@ -44,15 +46,7 @@ QVariant FuseModel::data(const QModelIndex &index, int role) const
                     } break; // column 0
                 case 1: { // fuse value
                         if (role == Qt::UserRole) {
-                            FuseBitField ret;
-                            if (part->fuseRegs[i].bitFields[j].enumValues.isEmpty()) {
-                                ret.isEnum = false;
-                                return QVariant::fromValue(ret);
-                            } else {
-                                ret.isEnum = true;
-                                ret.enumValues = part->fuseRegs[i].bitFields[j].enumValues;
-                                return QVariant::fromValue(ret);
-                            }
+                            return QVariant::fromValue(part->fuseRegs[i].bitFields[j]);
                         } else if (role ==  Qt::DisplayRole) {
                             return part->fuseRegs[i].bitFields[j].value;
                         }
@@ -66,7 +60,7 @@ QVariant FuseModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool FuseModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool FuseModelCute::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     int rowCounter = 0;
     if ((role == Qt::DisplayRole)  || (role == Qt::EditRole)) {
@@ -74,7 +68,18 @@ bool FuseModel::setData(const QModelIndex &index, const QVariant &value, int rol
             for (int i = 0; i<part->fuseRegs.count(); i++) {// this cycle loops on the (HIGH LOW EXTENDED FUSE) part->fuseRegs
                 for (int j = 0; j<part->fuseRegs[i].bitFields.count(); j++) { // this loops on the fuses bitfields
                     if (rowCounter == index.row()) {
+                        qWarning() << "mask" << QString::number(part->fuseRegs[i].bitFields[j].mask, 2) << "val" << value;
+                        qWarning() << part->fuseRegs[i].value << QString::number(part->fuseRegs[i].value, 2);
                         part->fuseRegs[i].bitFields[j].value = value.toInt();
+                        part->fuseRegs[i].value &= ~part->fuseRegs[i].bitFields[j].mask;
+                        int l;
+                        for (l = 0; l<8; l++) {
+                            if (part->fuseRegs[i].bitFields[j].mask & (1<<l)) {
+                                break;
+                            }
+                        }
+                        part->fuseRegs[i].value |= part->fuseRegs[i].bitFields[j].value * (1<<l);
+                        qWarning() << part->fuseRegs[i].value << QString::number(part->fuseRegs[i].value, 2);
                         return true;
                     } // we have found the searched bitfield
                     rowCounter++;
@@ -85,7 +90,7 @@ bool FuseModel::setData(const QModelIndex &index, const QVariant &value, int rol
     return false;
 }
 
-int FuseModel::rowCount(const QModelIndex &parent) const
+int FuseModelCute::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
@@ -96,7 +101,7 @@ int FuseModel::rowCount(const QModelIndex &parent) const
     return rowCount;
 }
 
-int FuseModel::columnCount(const QModelIndex &parent) const
+int FuseModelCute::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
@@ -183,8 +188,12 @@ Qt::ItemFlags FuseValuesModel::flags(const QModelIndex &index) const
         if (index.row() %2 == 0) {
             return Qt::ItemIsEnabled;
         } else {
-            if (index.column() > 0)
+            if (index.column() > 0) {
                 return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
+            } else {
+                qWarning() << "1st" << index;
+                return Qt::ItemIsEnabled;
+            }
         }
     } else {
         if (index.column() == 1) {
@@ -204,6 +213,8 @@ void FuseValuesModel::setDisplayMode(FuseBitDisplayMode mode)
     currentMode = mode;
     if (mode == FuseBitDisplayMode_BinaryDetailed) {
         emit dataChanged(this->index(0,0), this->index(part->fuseRegs.size()*2, 9));
+    } else {
+
     }
     this->reset();
 }

@@ -41,7 +41,7 @@ private:
     QLabel *statusBarLabel;
     QMenu *textOutPutMenu;
 
-    FuseModel *fuseModel;
+    FuseModelCute *fuseModel;
     FuseDelegate *fuseDelegate;
 
     FuseValuesModel *fuseValuesModel;
