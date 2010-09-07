@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabMain">
        <attribute name="title">
@@ -76,7 +76,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_2">
+         <widget class="QGroupBox" name="groupBoxProgModeAndTarget">
           <property name="title">
            <string>Programming Mode and Target Settings</string>
           </property>
@@ -85,7 +85,7 @@
             <widget class="QComboBox" name="comboBoxIspMode"/>
            </item>
            <item row="0" column="1">
-            <widget class="QPushButton" name="pushButton_3">
+            <widget class="QPushButton" name="pushButtonProgmodeSettings">
              <property name="text">
               <string>Settings</string>
              </property>
@@ -96,7 +96,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLabel" name="label_3">
+            <widget class="QLabel" name="labelISPFreq">
              <property name="text">
               <string>ISP Frequency</string>
              </property>
@@ -344,6 +344,37 @@
           </attribute>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="labelFuseBiDisplaymode">
+          <property name="text">
+           <string>Fuse value display:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="comboBoxFuseDisplaymode">
+          <item>
+           <property name="text">
+            <string>Decimal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Hexadecimal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Binary</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Binary detailed</string>
+           </property>
+          </item>
+         </widget>
+        </item>
         <item row="4" column="0" colspan="2">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="bottomMargin">
@@ -387,37 +418,6 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="labelFuseBiDisplaymode">
-          <property name="text">
-           <string>Fuse value display:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="comboBoxFuseDisplaymode">
-          <item>
-           <property name="text">
-            <string>Decimal</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Hexadecimal</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Binary</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Binary detailed</string>
-           </property>
-          </item>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tabLockBits">
@@ -434,6 +434,49 @@
         </item>
         <item>
          <widget class="QTableWidget" name="tableWidgetLockBitsSum"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QCheckBox" name="checkBoxAutoReadLockbits">
+            <property name="text">
+             <string>Auto read</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonProgramLockbits">
+            <property name="text">
+             <string>Program</string>
+            </property>
+            <property name="icon">
+             <iconset resource="icons/icons.qrc">
+              <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonVerifyLockbits">
+            <property name="text">
+             <string>Verify</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonReadLockbits">
+            <property name="text">
+             <string>Read</string>
+            </property>
+            <property name="icon">
+             <iconset resource="icons/icons.qrc">
+              <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -453,7 +496,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_4">
+            <widget class="QLabel" name="labelCalibrateFreq">
              <property name="text">
               <string>Calibrate for freqency</string>
              </property>
@@ -486,7 +529,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
-         <widget class="QGroupBox" name="groupBox_4">
+         <widget class="QGroupBox" name="groupBoxVoltages">
           <property name="title">
            <string>Voltages</string>
           </property>
@@ -551,7 +594,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="2" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox_6">
+         <widget class="QGroupBox" name="groupBoxPaths">
           <property name="title">
            <string>Paths</string>
           </property>
@@ -606,17 +649,17 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="2" column="1">
             <widget class="QComboBox" name="comboBoxDefaultTab"/>
            </item>
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="labelDefaultTab">
              <property name="text">
               <string>Default tab:</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
+           <item row="2" column="2">
             <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -628,6 +671,13 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="checkBoxNoIcons">
+             <property name="text">
+              <string>Do not show icons</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -686,7 +736,7 @@
             <widget class="QLineEdit" name="lineEditProgrammerPort"/>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="label_6">
+            <widget class="QLabel" name="labelProgrammerport">
              <property name="text">
               <string>Port</string>
              </property>
@@ -699,7 +749,7 @@
             <widget class="QComboBox" name="comboBoxProgrammer"/>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="labelProgrammertype">
              <property name="text">
               <string>Programmer type:</string>
              </property>
@@ -748,6 +798,8 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This program was written by &lt;a href=&quot;mailto:martonmiklosqdev@gmail.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Miklós Márton&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2010&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
@@ -761,7 +813,7 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="pushButtonAboutQt">
           <property name="text">
            <string>About Qt</string>
           </property>

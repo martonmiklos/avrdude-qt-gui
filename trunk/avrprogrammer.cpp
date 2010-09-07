@@ -3,8 +3,8 @@
 #include <QFile>
 #include <QStringList>
 #include <QString>
-AvrProgrammer::AvrProgrammer(Settings *sa, QObject *parent)
-    : QObject(parent), settings(sa)
+AvrProgrammer::AvrProgrammer(Settings *sa, AvrPart *part, QObject *parent)
+    : QObject(parent), currentPart(part), settings(sa)
 {
     if (friendlyName.isEmpty())
         friendlyName = avrDudeName;
@@ -121,7 +121,7 @@ void AvrProgrammer::dudeFinished(int retcode)
             emit taskFinishedOk("Programming the flash memory was successful.");
         } else {
             emit taskFailed(QString(tr("Flash writing failed: avrdude retcode: %1.<br>"
-                                        "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
+                                       "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
         }
         break;
     case DudeTaskVerifyFlash:
@@ -135,28 +135,53 @@ void AvrProgrammer::dudeFinished(int retcode)
     case DudeTaskReadFuse: {
             if (!retcode) {
                 bool ok = true;
-                QMap<QString, quint8> map;
                 for (int i = 0; i<fusesToRead.size(); i++)  {
                     bool ok = false;
                     QFile currentFuseOutFile(QDir::tempPath()+"/"+fusesToRead[i]+".txt");
                     currentFuseOutFile.open(QFile::ReadOnly);
                     quint8 currentFuseValue = currentFuseOutFile.readAll().trimmed().toInt(&ok, 16);
                     currentFuseOutFile.close();
-                    if (ok == false)
+                    if (ok == false) {
                         emit taskFailed(QString(tr("Unable to read the %1 fuse")).arg(fuseNamesToRead[i]));
-                    map[fuseNamesToRead[i]] = currentFuseValue;
+                    } else {
+                        for(int j = 0; j< currentPart->fuseRegs.size(); j++) {
+                            if (currentPart->fuseRegs[j].name == fusesToRead[i]) {
+                                currentPart->fuseRegs[j].value = currentFuseValue;
+                                for (int k = 0; k<currentPart->fuseRegs[j].bitFields.count(); k++) {
+                                    if (currentPart->fuseRegs[j].bitFields[k].isEnum) {
+                                        currentPart->fuseRegs[j].bitFields[k].value =
+                                                (currentPart->fuseRegs[j].value & currentPart->fuseRegs[j].bitFields[k].mask);
+                                        int l;
+                                        for (l = 0; l<8; l++) {
+                                            if (currentPart->fuseRegs[j].bitFields[k].mask & (1<<l)) {
+                                                break;
+                                            }
+                                        }
+                                        currentPart->fuseRegs[j].bitFields[k].value = currentPart->fuseRegs[j].bitFields[k].value / (1<<l);
+                                    } else {
+                                        currentPart->fuseRegs[j].bitFields[k].value = ((currentPart->fuseRegs[j].value & currentPart->fuseRegs[j].bitFields[k].mask) != 0);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 if (ok) {
-                    emit taskFinishedOk(QString(tr("Reading the fuse bits done")));
-                    emit fusesReaded(map);
+                    emit taskFinishedOk(tr("Reading the fuse bits done"));
+                    emit fusesReaded();
                 }
             } else {
-                emit taskFailed("Failed to read the fuse bits");
+                emit taskFailed(tr("Failed to read the fuse bits"));
             }
         } break;
     case DudeTaskWriteFuse: {
-
+            if (!retcode) {
+                emit taskFinishedOk(tr("Writing the fuse bits was successful"));
+            } else {
+                emit taskFailed(tr("Failed to write the fuse bits"));
+            }
         } break;
     case DudeTaskVerifyFuse: {
 
@@ -174,6 +199,44 @@ void AvrProgrammer::dudeFinished(int retcode)
         } break;
     case DudeTaskWriteEEPROM: {
 
+        } break;
+    case DudeTaskReadLock: {
+            if (!retcode) {
+                QFile currentLockByteFile(QDir::tempPath()+"/lockbyte_value.txt");
+                if (currentLockByteFile.open(QFile::ReadOnly)) {
+                    bool ok = false;
+                    quint8 lockbyte = currentLockByteFile.readAll().trimmed().toInt(&ok, 16);
+                    currentLockByteFile.close();
+                    if (ok == false) {
+                        emit taskFailed(tr("The lockbyte value is not hexadecimal in the %1 file")
+                                        .arg(currentLockByteFile.fileName()));
+                    } else {
+                        currentPart->lockbyte.value = lockbyte;
+                        for (int k = 0; k<currentPart->lockbyte.bitFields.count(); k++) {
+                            if (currentPart->lockbyte.bitFields[k].isEnum) {
+                                currentPart->lockbyte.bitFields[k].value =
+                                        (currentPart->lockbyte.value & currentPart->lockbyte.bitFields[k].mask);
+                                int l;
+                                for (l = 0; l<8; l++) {
+                                    if (currentPart->lockbyte.bitFields[k].mask & (1<<l)) {
+                                        break;
+                                    }
+                                }
+                                currentPart->lockbyte.bitFields[k].value = currentPart->lockbyte.bitFields[k].value / (1<<l);
+                            } else {
+                                currentPart->lockbyte.bitFields[k].value = ((currentPart->lockbyte.value & currentPart->lockbyte.bitFields[k].mask) != 0);
+                            }
+                        }
+                        emit taskFinishedOk(tr("Reading the lockbyte was successful (0x%1)")
+                                            .arg(QString::number(lockbyte, 16).rightJustified(2, '0')));
+                        emit lockBitReaded();
+                    }
+                } else {
+                    emit taskFailed(tr("Unable to open the %1 file").arg(currentLockByteFile.fileName()));
+                }
+            } else {
+                emit taskFailed(tr("Failed to read the lock byte"));
+            }
         } break;
     case DudeTaskNone: {
 
@@ -249,9 +312,21 @@ void AvrProgrammer::readEEPROM(QString hexFileName)
     emit avrDudeOut(startString);
 }
 
+void AvrProgrammer::programFuses()
+{
+    currentDudeTask = DudeTaskWriteFuse;
+    QString startString = staticProgrammerCommand();
+    for (int i = 0; i<currentPart->fuseRegs.count(); i++) {
+        QString currentFuseArg = getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs[i].name);
+        startString.append(" -U "+currentFuseArg+":w:"
+                           "0x"+QString::number(currentPart->fuseRegs[i].value, 16).rightJustified(2, '0')+":m");
+    }
+    avrDudeProcess->start(startString);
+    emit avrDudeOut(startString);
+}
+
 void AvrProgrammer::readFuses(QStringList fuseList)
 {
-
     currentDudeTask = DudeTaskReadFuse;
     QString startString = staticProgrammerCommand();
     fusesToRead.clear();
@@ -268,20 +343,41 @@ void AvrProgrammer::readFuses(QStringList fuseList)
     emit avrDudeOut(startString);
 }
 
+void AvrProgrammer::programLockByte()
+{
+    currentDudeTask = DudeTaskReadLock;
+    QString startString = staticProgrammerCommand();
+    startString.append(" -U  lock:w:0x"+QString::number(currentPart->lockbyte.value, 16).rightJustified(2,'0')+":m");
+    avrDudeProcess->start(startString);
+    emit avrDudeOut(startString);
+}
+
+void AvrProgrammer::readLockByte()
+{
+    currentDudeTask = DudeTaskReadLock;
+    QString startString = staticProgrammerCommand();
+    QFile currentLockByteFile(QDir::tempPath()+"/lockbyte_value.txt");
+    if (currentLockByteFile.exists())
+        currentLockByteFile.remove();
+    startString.append(" -U  lock:r:"+currentLockByteFile.fileName()+":h");
+    avrDudeProcess->start(startString);
+    emit avrDudeOut(startString);
+}
+
 QString AvrProgrammer::staticProgrammerCommand()
 {
     QString ret;
     if (!settings->particularProgOptions) {
         ret = QString("%1 -p %2 -c %3 -P %4")
-                              .arg(settings->dudePath)
-                              .arg(settings->partName)
-                              .arg(settings->programmerName)
-                              .arg(settings->programmerPort);
+              .arg(settings->dudePath)
+              .arg(settings->partName)
+              .arg(settings->programmerName)
+              .arg(settings->programmerPort);
     } else {
         ret = QString("%1 -p %3 %2")
-                      .arg(settings->dudePath)
-                      .arg(settings->programmerOptions)
-                      .arg(settings->partName);
+              .arg(settings->dudePath)
+              .arg(settings->programmerOptions)
+              .arg(settings->partName);
     }
     return ret;
 }

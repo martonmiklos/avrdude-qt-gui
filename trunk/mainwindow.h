@@ -44,6 +44,9 @@ private:
     FuseModelCute *fuseModel;
     FuseDelegate *fuseDelegate;
 
+    LockBitsModel *locksModel;
+    LockDelegate *lockDelegate;
+
     FuseValuesModel *fuseValuesModel;
 
     void fillDeviceList();
@@ -52,6 +55,9 @@ private:
     void fillDefaultTabComboBox();
 
 private slots:
+    void on_pushButtonProgramLockbits_clicked();
+    void on_pushButtonReadLockbits_clicked();
+    void on_checkBoxNoIcons_toggled(bool checked);
     void on_comboBoxFuseDisplaymode_activated(int index);
     void on_textEditMessages_anchorClicked(QUrl );
     void on_pushButtonReadReadEEPROM_clicked();
@@ -59,7 +65,7 @@ private slots:
     void on_pushButtonProgramEEPROM_clicked();
     void on_comboBoxDefaultTab_activated(int index);
     void on_checkBoxLastTabRemember_toggled(bool checked);
-    void on_pushButton_2_clicked();
+    void on_pushButtonAboutQt_clicked();
     void on_pushButtonReadFuses_clicked();
     void on_pushButtonProgramFuses_clicked();
     void on_pushButtonReadReadFlash_clicked();
@@ -88,6 +94,7 @@ private slots:
     void logMessage(QString msg);
     void logError(QString msg);
     void reloadFuseView();
+    void reloadLocksView();
     void progressStep();
     void verifyFailed(QString what, int offset, int value_read, int value_waited);
 };

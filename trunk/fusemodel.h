@@ -16,7 +16,7 @@ typedef enum {
     FuseBitDisplayMode_BinaryDetailed
 } FuseBitDisplayMode;
 
-class FuseBitField // represent a fusebitgroup (line CLKSEL)
+class FuseBitField // represent a fusebitgroup (like CLKSEL)
 {
 public:
     FuseBitField(){}
@@ -24,7 +24,7 @@ public:
     int mask;
     int value; // value is similar like in the XML file (right aligned)
     bool isEnum;
-    QMap <QString, int> enumValues;// predefined group values & their name
+    QMap <int, QString> enumValues;// predefined group values & their name
 };
 
 Q_DECLARE_METATYPE(FuseBitField);
@@ -72,7 +72,21 @@ public:
 
 private:
     FuseBitDisplayMode currentMode;
+};
 
+class LockBitsModel : public QAbstractTableModel
+{
+    Q_OBJECT
+public:
+    LockBitsModel(AvrPart *pa, QObject *parent = 0) : QAbstractTableModel(parent), part(pa) {}
+    AvrPart *part;
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    void reloadModel();
 };
 
 #endif // FUSEMODEL_H

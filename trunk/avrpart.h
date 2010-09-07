@@ -12,6 +12,31 @@
 
 class FuseRegister;
 
+class LockBitField
+{
+public:
+    LockBitField(){}
+    QString shortName, text;
+    int mask;
+    int value; // value is similar like in the XML file (right aligned)
+    bool isEnum;
+    QMap <int, QString> enumValues;// predefined group values & their name
+};
+
+Q_DECLARE_METATYPE(LockBitField);
+
+class LockRegister
+{
+public:
+    LockRegister(){}
+    //LockRegister(QString name, int offset, int size) :name(name), offset(offset), size(size){}
+    QList<LockBitField> bitFields;
+    quint8 value;
+    QString name;
+    int offset;
+    int size;
+};
+
 class AvrPart : public QObject
 {
     Q_OBJECT
@@ -26,6 +51,7 @@ private:
 
     void fillPartNosMap(); // FIXME make it static
     bool fillFuseModel();
+    bool fillLockBitModel();
     bool findXml(QString);
     QMap<QString, QString> dudePartNos;
     Settings *settings;
@@ -41,15 +67,12 @@ public:
     QString findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2);
     QStringList getSupportedFuses();
     QList <FuseRegister> fuseRegs;
+    LockRegister lockbyte;
     QString getFuseRegisterBitName(QString fuseReg, int bitnum);
     QString getFuseRegisterBitName(int fuseReg, int bitnum);
 
 signals:
     void reloadFuseView();
-
-public slots:
-    void fusesReaded(QMap<QString, quint8> fuseValues);
-
 };
 
 #endif // AVRPART_H

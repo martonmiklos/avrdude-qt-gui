@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    LockRegister lf;
     statusBarLabel = new QLabel(this);
     statusBarLabel->setText("asd");
     ui->setupUi(this);
@@ -16,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // settings to gui
     settings = new Settings(this);
+    ui->checkBoxNoIcons->hide();// FIXME workaround
     ui->lineEditAvrDudePath->setText(settings->dudePath);
     ui->lineEditXmlsPath->setText(settings->xmlsPath);
     ui->checkBoxOverrideProgrammersOptions->setChecked(settings->particularProgOptions);
@@ -44,29 +46,39 @@ MainWindow::MainWindow(QWidget *parent) :
 
     fuseModel = new FuseModelCute(avrPart, this);
     fuseValuesModel = new FuseValuesModel(avrPart, this);
+    locksModel = new LockBitsModel(avrPart, this);
 
     // the avrpart object fills the fuseModel
     ui->tableViewFuses->setEditTriggers(QTableView::QAbstractItemView::CurrentChanged);
     ui->tableViewFuses->setModel(fuseModel);
-
-    ui->tableViewFuseSum->setModel(fuseValuesModel);
-
     fuseDelegate = new FuseDelegate(this);
     ui->tableViewFuses->setItemDelegateForColumn(1, fuseDelegate);
     connect(avrPart, SIGNAL(reloadFuseView()), this, SLOT(reloadFuseView()));
     reloadFuseView();
+
+    // fuse value model
+    ui->tableViewFuseSum->setModel(fuseValuesModel);
+
+    // lockbitsmodel
+    ui->tableViewLockBits->setModel(locksModel);
+    ui->tableViewLockBits->horizontalHeader()->setStretchLastSection(true);
+    lockDelegate = new LockDelegate(this);
+    ui->tableViewLockBits->setItemDelegateForColumn(1, lockDelegate);
+    reloadLocksView();
+
     statusBarLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     statusBarLabel->setTextFormat(Qt::RichText);
     statusBarLabel->setText(QString("<b>%1 %2</b>").arg(avrPart->getPartName()).arg(avrPart->getSignature()));
 
-    avrProgrammer = new AvrProgrammer(settings, this);
+    avrProgrammer = new AvrProgrammer(settings, avrPart, this);
     connect(avrProgrammer, SIGNAL(avrDudeOut(QString)), this, SLOT(avrDudeOut(QString)));
     connect(avrProgrammer, SIGNAL(signatureReadSignal(quint8,quint8,quint8)), this, SLOT(signatureRead(quint8,quint8,quint8)));
     connect(avrProgrammer, SIGNAL(taskFailed(QString)), this, SLOT(logError(QString)));
     connect(avrProgrammer, SIGNAL(taskFinishedOk(QString)), this,SLOT(logMessage(QString)));
     connect(avrProgrammer, SIGNAL(progressStep()), this, SLOT(progressStep())); // this will output nice dots to the messages view during the long operations
     connect(avrProgrammer, SIGNAL(verifyMismatch(QString,int,int,int)), this, SLOT(verifyFailed(QString,int,int,int)));
-    connect(avrProgrammer, SIGNAL(fusesReaded(QMap<QString,quint8>)), avrPart, SLOT(fusesReaded(QMap<QString,quint8>)));
+    connect(avrProgrammer, SIGNAL(fusesReaded()), this, SLOT(reloadFuseView()));
+    connect(avrProgrammer, SIGNAL(lockBitReaded()), this, SLOT(reloadLocksView()));
 
     ui->checkBoxLastTabRemember->setChecked(settings->rememberLastTab);
     if (settings->rememberLastTab == true) {
@@ -185,6 +197,14 @@ void MainWindow::reloadFuseView()
     fuseModel->reloadModel();
     for (int i = 0; i<fuseModel->rowCount(fuseModel->index(-1,-1)) ; i++) {
         ui->tableViewFuses->openPersistentEditor(fuseModel->index(i, 1));
+    }
+}
+
+void MainWindow::reloadLocksView()
+{
+    locksModel->reloadModel();
+    for (int i = 0; i<locksModel->rowCount(locksModel->index(-1,-1)) ; i++) {
+        ui->tableViewLockBits->openPersistentEditor(locksModel->index(i, 1));
     }
 }
 
@@ -563,9 +583,33 @@ void MainWindow::on_pushButtonReadReadFlash_clicked()
 
 void MainWindow::on_pushButtonProgramFuses_clicked()
 {
-    for (int i = 0; i< avrPart->fuseRegs.count(); i++)
-        qWarning() <<avrPart->fuseRegs.at(i).value << avrPart->fuseRegs.at(i).name;
-
+    QString fuseNames;
+    for (int i = 0; i< avrPart->fuseRegs.count(); i++) {
+        fuseNames.append(avrPart->fuseRegs[i].name);
+        if (i != (avrPart->fuseRegs.count()-1))
+            fuseNames.append(", ");
+        for (int j = 0; j<avrPart->fuseRegs[i].bitFields.count(); j++) {
+            if (avrPart->fuseRegs[i].bitFields[j].text.contains("clock", Qt::CaseInsensitive) &&
+                avrPart->fuseRegs[i].bitFields[j].text.contains("source", Qt::CaseInsensitive)) {
+                if (avrPart->fuseRegs[i].bitFields[j].enumValues.value(avrPart->fuseRegs[i].bitFields[j].value)
+                    .contains("Ext", Qt::CaseInsensitive)) {
+                    QMessageBox msgBox(QMessageBox::Warning, tr("Are you sure"), tr("It seems to be that you have selected external clock\n"
+                                                                                    "for clock source. You may brick you AVR if you do not\n"
+                                                                                    "have the external clock!\n"
+                                                                                    "Do you really want to program these fuses?"));
+                    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                    msgBox.setDefaultButton(QMessageBox::No);
+                    if (msgBox.exec() != QMessageBox::Yes) {
+                        return;
+                    }
+                    goto program;
+                }
+            }
+        }
+    }
+    program:
+    logMessage(tr("Programming the %1 fuse bits").arg(fuseNames));
+    avrProgrammer->programFuses();
 }
 
 void MainWindow::on_pushButtonReadFuses_clicked()
@@ -574,7 +618,7 @@ void MainWindow::on_pushButtonReadFuses_clicked()
     avrProgrammer->readFuses(avrPart->getSupportedFuses());
 }
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_pushButtonAboutQt_clicked()
 {
     QApplication::aboutQt();
 }
@@ -637,4 +681,31 @@ void MainWindow::on_textEditMessages_anchorClicked(QUrl link)
 void MainWindow::on_comboBoxFuseDisplaymode_activated(int index)
 {
     fuseValuesModel->setDisplayMode((FuseBitDisplayMode) index);
+}
+
+void MainWindow::on_checkBoxNoIcons_toggled(bool checked)
+{
+    settings->noicons = checked;
+    QMessageBox::warning(this, tr("Warning"), tr("This change only takes effect after restarting the program"));
+}
+
+void MainWindow::on_pushButtonReadLockbits_clicked()
+{
+    logMessage(tr("Reading the lockbyte"));
+    avrProgrammer->readLockByte();
+}
+
+void MainWindow::on_pushButtonProgramLockbits_clicked()
+{
+    if (QMessageBox::warning(this,
+                             tr("Warning"),
+                             tr("Writing the lockbits are dangerous!\n"
+                                "You may brick your device!\n"
+                                "Do you really want to continue?"),
+                             QMessageBox::Yes,
+                             QMessageBox::No) == QMessageBox::Yes) {
+        logMessage(tr("Writing the lockbyte (value: 0x%2)")
+                   .arg(QString::number(avrPart->lockbyte.value, 16).rightJustified(2, '0')));
+        avrProgrammer->programLockByte();
+    }
 }
