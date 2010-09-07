@@ -133,6 +133,7 @@ void AvrProgrammer::dudeFinished(int retcode)
         }
         break;
     case DudeTaskReadFuse: {
+            QString fuseValues;
             if (!retcode) {
                 bool ok = true;
                 for (int i = 0; i<fusesToRead.size(); i++)  {
@@ -144,8 +145,14 @@ void AvrProgrammer::dudeFinished(int retcode)
                     if (ok == false) {
                         emit taskFailed(QString(tr("Unable to read the %1 fuse")).arg(fuseNamesToRead[i]));
                     } else {
+                        // fancy output to the status listbox
+                        fuseValues.append(fusesToRead[i].toUpper()+
+                                          ": 0x"+QString::number(currentFuseValue, 16).rightJustified(2, '0').toUpper());
+                        if (i != (fusesToRead.size() -1))
+                            fuseValues.append(", ");
+
                         for(int j = 0; j< currentPart->fuseRegs.size(); j++) {
-                            if (currentPart->fuseRegs[j].name == fusesToRead[i]) {
+                            if (getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs[j].name) == fusesToRead[i]) {
                                 currentPart->fuseRegs[j].value = currentFuseValue;
                                 for (int k = 0; k<currentPart->fuseRegs[j].bitFields.count(); k++) {
                                     if (currentPart->fuseRegs[j].bitFields[k].isEnum) {
@@ -169,7 +176,7 @@ void AvrProgrammer::dudeFinished(int retcode)
                 }
 
                 if (ok) {
-                    emit taskFinishedOk(tr("Reading the fuse bits done"));
+                    emit taskFinishedOk(QString(tr("Reading the fuse bits done (%1)")).arg(fuseValues));
                     emit fusesReaded();
                 }
             } else {

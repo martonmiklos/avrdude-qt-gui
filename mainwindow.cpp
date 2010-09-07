@@ -54,11 +54,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableViewFuses->setModel(fuseModel);
     fuseDelegate = new FuseDelegate(this);
     ui->tableViewFuses->setItemDelegateForColumn(1, fuseDelegate);
+    connect(fuseModel, SIGNAL(changed()), this, SLOT(reloadFuseView()));
     connect(avrPart, SIGNAL(reloadFuseView()), this, SLOT(reloadFuseView()));
-    reloadFuseView();
 
     // fuse value model
     ui->tableViewFuseSum->setModel(fuseValuesModel);
+    fuseValueDelegate = new FuseValueDelegate(this);
+    connect(fuseValuesModel, SIGNAL(changed()), this, SLOT(reloadFuseView()));
+    ui->tableViewFuseSum->setItemDelegateForColumn(1, fuseValueDelegate);
+
+    reloadFuseView();
 
     // lockbitsmodel
     ui->tableViewLockBits->setModel(locksModel);
@@ -224,6 +229,11 @@ void MainWindow::reloadFuseView()
     fuseModel->reloadModel();
     for (int i = 0; i<fuseModel->rowCount(fuseModel->index(-1,-1)) ; i++) {
         ui->tableViewFuses->openPersistentEditor(fuseModel->index(i, 1));
+    }
+
+    fuseValuesModel->reloadModel();
+    for (int i = 0; i<fuseValuesModel->rowCount(fuseValuesModel->index(-1,-1)) ; i++) {
+        ui->tableViewFuseSum->openPersistentEditor(fuseValuesModel->index(i, 1));
     }
 }
 
@@ -708,7 +718,9 @@ void MainWindow::on_textEditMessages_anchorClicked(QUrl link)
 
 void MainWindow::on_comboBoxFuseDisplaymode_activated(int index)
 {
-    fuseValuesModel->setDisplayMode((FuseBitDisplayMode) index);
+    //fuseValuesModel->setDisplayMode(index);
+    fuseValueDelegate->setDisplayMode((FuseValueDisplayMode)index);
+    reloadFuseView();
 }
 
 void MainWindow::on_checkBoxNoIcons_toggled(bool checked)
@@ -727,8 +739,9 @@ void MainWindow::on_pushButtonProgramLockbits_clicked()
 {
     if (QMessageBox::warning(this,
                              tr("Warning"),
-                             tr("Writing the lockbits are dangerous!\n"
-                                "You may brick your device!\n"
+                             tr("Writing the lockbits is dangerous!\n"
+                                "You may make your device unusable\n"
+                                "if you are not careful!\n"
                                 "Do you really want to continue?"),
                              QMessageBox::Yes,
                              QMessageBox::No) == QMessageBox::Yes) {

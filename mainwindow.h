@@ -48,6 +48,7 @@ private:
     LockDelegate *lockDelegate;
 
     FuseValuesModel *fuseValuesModel;
+    FuseValueDelegate *fuseValueDelegate;
 
     void fillDeviceList();
     void fillProgrammersList();

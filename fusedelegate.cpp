@@ -68,11 +68,11 @@ QWidget *FuseValueDelegate::createEditor(QWidget *parent,
     editor->setAutoFillBackground(true);
     switch (currentDisplayMode) {
     case Hexadecimal:
-        editor->setInputMask("0xHH;_");
-        editor->setText("0x"+QString::number(value, 16).rightJustified(2, '0'));
+        editor->setInputMask("0x>HH;_");
+        editor->setText("0x"+QString::number(value, 16).rightJustified(2, '0').toUpper());
         break;
     case Decimal:
-        editor->setInputMask("000\d;_");
+        editor->setInputMask("000;_");
         editor->setText(QString::number(value, 10)+"d");
         break;
     case Binary:
@@ -91,10 +91,10 @@ void FuseValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
     switch (currentDisplayMode) {
     case Hexadecimal:
         cb->setInputMask("0xHH;_");
-        cb->setText("0x"+QString::number(value, 16).rightJustified(2, '0'));
+        cb->setText("0x"+QString::number(value, 16).rightJustified(2, '0').toUpper());
         break;
     case Decimal:
-        cb->setInputMask("000\d;_");
+        cb->setInputMask("000;_");
         cb->setText(QString::number(value, 10)+"d");
         break;
     case Binary:
@@ -109,11 +109,29 @@ void FuseValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                    const QModelIndex &index) const
 {
     int value = 0;
-
-    model->setData(index, value, Qt::EditRole);
+    bool ok = false;
+    QLineEdit *le = static_cast<QLineEdit*>(editor);
+    QString valueText = le->text();
+    switch (currentDisplayMode) {
+    case Hexadecimal:
+        valueText = valueText.mid(2);
+        value = valueText.toInt(&ok, 16);
+        break;
+    case Decimal:
+        valueText = valueText.left(valueText.size()-1);
+        value = valueText.toInt(&ok, 10);
+        break;
+    case Binary:
+        valueText = valueText.mid(2);
+        value = valueText.toInt(&ok, 2);
+        break;
+    }
+    if ((ok) && (value < 256)) {
+        model->setData(index, value, Qt::EditRole);
+    }
 }
 
-void FuseValueDelegate::setDisplayMode(DisplayMode mode)
+void FuseValueDelegate::setDisplayMode(FuseValueDisplayMode mode)
 {
     currentDisplayMode = mode;
 }

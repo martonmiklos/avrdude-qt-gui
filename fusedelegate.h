@@ -8,6 +8,7 @@
 #include <QLineEdit>
 
 #include "fusemodel.h"
+
 class FuseDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
@@ -27,21 +28,19 @@ public:
     }
 signals:
 
-public slots:
-
 };
+
+typedef enum {
+    Hexadecimal = 0,
+    Binary = 1,
+    Decimal = 2
+} FuseValueDisplayMode;
 
 class FuseValueDelegate : public QStyledItemDelegate
 {
-    typedef enum {
-        Hexadecimal,
-        Binary,
-        Decimal
-    }DisplayMode;
-
     Q_OBJECT
 public:
-    explicit FuseValueDelegate(QObject *parent = 0);
+    explicit FuseValueDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {currentDisplayMode = Hexadecimal;}
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const;
 
@@ -55,12 +54,10 @@ public:
         editor->setGeometry(option.rect);
     }
 
-    void setDisplayMode(DisplayMode mode);
+    void setDisplayMode(FuseValueDisplayMode mode);
 private:
-    DisplayMode currentDisplayMode;
+    FuseValueDisplayMode currentDisplayMode;
 signals:
-
-public slots:
 };
 
 class LockDelegate : public QStyledItemDelegate

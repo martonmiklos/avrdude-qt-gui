@@ -22,7 +22,7 @@ bool AvrPart::setPartName(QString name)
     try {
         domFile.setFileName(settings->xmlsPath+"/"+name+".xml");
         if (!domFile.open(QFile::ReadOnly))  {
-            throw QString("Could not open the %1 xml file").arg(name+".xml");
+            throw QString(tr("Could not open the %1 xml file")).arg(name+".xml");
         }
 
         if (!domDoc.setContent(&domFile)) {
@@ -191,7 +191,7 @@ bool AvrPart::fillFuseModel()
     try {
         domFile.setFileName(settings->xmlsPath+"/"+partNameStr+".xml");
         if (!domFile.open(QFile::ReadOnly))  {
-            throw QString("Could not open the %1 xml file").arg(partNameStr+".xml");
+            throw QString(tr("Could not open the %1 xml file")).arg(partNameStr+".xml");
         }
 
         if (!domDoc.setContent(&domFile)) {
@@ -225,7 +225,7 @@ bool AvrPart::fillFuseModel()
         }
 
         if (!regFuseFound) {
-            throw QString("Cannot found the FUSE key");
+            throw QString(tr("Cannot found the FUSE key"));
         } else {
             // this will iterate on the High low, extended fuses or on fuse[N] keys at xmega devices
             for(int i = 0; i<registersFuseNode.childNodes().count(); i++) {
@@ -249,6 +249,7 @@ bool AvrPart::fillFuseModel()
                     currentBitField.mask = fuseBitfieldElement.attribute("mask").toInt(&ok, 16);
                     currentBitField.text = fuseBitfieldElement.attribute("text");
                     currentBitField.isEnum = false;
+                    currentBitField.value = 0;
                     if (enumName != "") {
                         currentBitField.isEnum = true;
                         QDomNodeList enumNodesList = registersFuseNode.parentNode().childNodes();
@@ -263,6 +264,8 @@ bool AvrPart::fillFuseModel()
                                     if (ok) {
                                         QString text = enumItemElement.attribute("text");
                                         currentBitField.enumValues[val] = text;
+                                    } else {
+                                        qWarning() << tr("%1 is not a hexadecimal number").arg(enumItemElement.attribute("val"));
                                     }
                                 }
                                 break;
@@ -277,7 +280,7 @@ bool AvrPart::fillFuseModel()
         }
 
         if (!regLockBitFound) {
-            throw QString("Cannot found the LOCKBITS key");
+            throw QString(tr("Cannot found the LOCKBITS key"));
         } else {
             for(int i = 0; i<1/*lockBitsNode.childNodes().count()*/; i++) {
                 QDomElement lockBitElement = lockBitsNode.childNodes().item(i).toElement();
@@ -337,7 +340,7 @@ bool AvrPart::fillLockBitModel()
     try {
         domFile.setFileName(settings->xmlsPath+"/"+partNameStr+".xml");
         if (!domFile.open(QFile::ReadOnly))  {
-            throw QString("Could not open the %1 xml file").arg(partNameStr+".xml");
+            throw QString(tr("Could not open the %1 xml file")).arg(partNameStr+".xml");
         }
 
         if (!domDoc.setContent(&domFile)) {
