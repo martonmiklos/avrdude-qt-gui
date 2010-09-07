@@ -40,8 +40,8 @@ QVariant FuseModelCute::data(const QModelIndex &index, int role) const
                 switch (index.column()) {
                 case 0: { // fuse name
                         switch(role) {
-                            case Qt::DisplayRole: return part->fuseRegs[i].bitFields[j].shortName; break;
-                            case Qt::ToolTipRole: return part->fuseRegs[i].bitFields[j].text; break;
+                        case Qt::DisplayRole: return part->fuseRegs[i].bitFields[j].shortName; break;
+                        case Qt::ToolTipRole: return part->fuseRegs[i].bitFields[j].text; break;
                         }; // switch role
                     } break; // column 0
                 case 1: { // fuse value
@@ -68,8 +68,6 @@ bool FuseModelCute::setData(const QModelIndex &index, const QVariant &value, int
             for (int i = 0; i<part->fuseRegs.count(); i++) {// this cycle loops on the (HIGH LOW EXTENDED FUSE) part->fuseRegs
                 for (int j = 0; j<part->fuseRegs[i].bitFields.count(); j++) { // this loops on the fuses bitfields
                     if (rowCounter == index.row()) {
-                        qWarning() << "mask" << QString::number(part->fuseRegs[i].bitFields[j].mask, 2) << "val" << value;
-                        qWarning() << part->fuseRegs[i].value << QString::number(part->fuseRegs[i].value, 2);
                         part->fuseRegs[i].bitFields[j].value = value.toInt();
                         part->fuseRegs[i].value &= ~part->fuseRegs[i].bitFields[j].mask;
                         int l;
@@ -79,7 +77,6 @@ bool FuseModelCute::setData(const QModelIndex &index, const QVariant &value, int
                             }
                         }
                         part->fuseRegs[i].value |= part->fuseRegs[i].bitFields[j].value * (1<<l);
-                        qWarning() << part->fuseRegs[i].value << QString::number(part->fuseRegs[i].value, 2);
                         return true;
                     } // we have found the searched bitfield
                     rowCounter++;
@@ -191,7 +188,6 @@ Qt::ItemFlags FuseValuesModel::flags(const QModelIndex &index) const
             if (index.column() > 0) {
                 return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
             } else {
-                qWarning() << "1st" << index;
                 return Qt::ItemIsEnabled;
             }
         }
@@ -219,3 +215,98 @@ void FuseValuesModel::setDisplayMode(FuseBitDisplayMode mode)
     this->reset();
 }
 
+QVariant LockBitsModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole)
+        return QVariant();
+
+    if (orientation == Qt::Horizontal) {
+        if (section == 0)
+            return tr("Name");
+        else
+            return tr("Value");
+    } else {
+        return section;
+    }
+}
+
+void LockBitsModel::reloadModel()
+{
+    this->dataChanged(this->index(1,0), this->index(1, this->rowCount(this->index(-1, -1))));
+    this->reset();
+
+}
+
+Qt::ItemFlags LockBitsModel::flags(const QModelIndex &index) const
+{
+    if (index.column() == 1) {
+        return Qt::ItemIsEditable | Qt::ItemIsEnabled;
+    }
+    return Qt::ItemIsEnabled;
+}
+
+QVariant LockBitsModel::data(const QModelIndex &index, int role) const
+{
+    int rowCounter = 0;
+    for (int j = 0; j<part->lockbyte.bitFields.count(); j++) {
+        if (rowCounter == index.row()) {
+            switch (index.column()) {
+            case 0: { // fuse name
+                    switch(role) {
+                    case Qt::DisplayRole: return part->lockbyte.bitFields[j].shortName; break;
+                    case Qt::ToolTipRole: return part->lockbyte.bitFields[j].text; break;
+                    }; // switch role
+                } break; // column 0
+            case 1: { // fuse value
+                    if (role == Qt::UserRole) {
+                        return QVariant::fromValue(part->lockbyte.bitFields[j]);
+                    } else if (role ==  Qt::DisplayRole) {
+                        return part->lockbyte.bitFields[j].value;
+                    }
+                } break; // column 1
+            } // switch index
+            break;
+        } // we have found the searched bitfield
+        rowCounter++;
+    } // this loops on the fuses bitfields
+    return QVariant();
+}
+
+bool LockBitsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    int rowCounter = 0;
+    if ((role == Qt::DisplayRole)  || (role == Qt::EditRole)) {
+        if (index.column() == 1) { //is the index points to the lockbits value column?
+            for (int j = 0; j<part->lockbyte.bitFields.count(); j++) { // this loops on the lockbits bitfields
+                if (rowCounter == index.row()) {
+                    part->lockbyte.bitFields[j].value = value.toInt();
+                    part->lockbyte.value &= ~part->lockbyte.bitFields[j].mask;
+                    int l;
+                    for (l = 0; l<8; l++) {
+                        if (part->lockbyte.bitFields[j].mask & (1<<l)) {
+                            break;
+                        }
+                    }
+                    part->lockbyte.value |= part->lockbyte.bitFields[j].value * (1<<l);
+                    return true;
+                } // we have found the searched bitfield
+                rowCounter++;
+            } // this loops on the lockregisters bitfields
+        }
+    }
+    return false;
+}
+
+int LockBitsModel::rowCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    return part->lockbyte.bitFields.count();
+}
+
+int LockBitsModel::columnCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    return 2;
+}

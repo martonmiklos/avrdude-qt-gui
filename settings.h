@@ -22,6 +22,7 @@ public:
     bool rememberLastTab;
     int defaultTabIndex;
     int lastTabIndex;
+    bool noicons;
 private:
     QSettings *settingsIni;
 signals:

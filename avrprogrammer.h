@@ -32,6 +32,9 @@ typedef enum
     DudeTaskReadEEPROM,
     DudeTaskWriteEEPROM,
     DudeTaskVerifyEEPROM,
+    DudeTaskReadLock,
+    DudeTaskWriteLock,
+    DudeTaskVerifyLock,
 
 } CurrentDudeTask;
 
@@ -39,8 +42,7 @@ class AvrProgrammer : public QObject
 {
     Q_OBJECT
 public:
-    AvrProgrammer(Settings *sa, QObject *parent = 0);
-    void setPart(AvrPart *part) {currentPart = part;}
+    AvrProgrammer(Settings *sa, AvrPart *part, QObject *parent = 0);
     QString getFriendlyName() const {return friendlyName;}
     QString getDudeName() const {return avrDudeName;}
     PortType getPortType() const {return portType;}
@@ -55,8 +57,14 @@ public:
     void verifyEEPROM(QString hexFileName);
     void readEEPROM(QString hexFileName);
 
+    void programFuses();
     void readFuses(QStringList fuseList);
-    void writeFuse(quint8 hfuse, quint8 lfuse);
+    void verifyFuses(QStringList fuseList);
+
+    void programLockByte();
+    void readLockByte();
+    void verifyLockByte();
+
     bool isWorking() const {return currentDudeTask == DudeTaskNone;}
 
 signals:
@@ -65,7 +73,8 @@ signals:
     void avrDudeOut(QString out);
     void taskFinishedOk(QString);
     void taskFailed(QString);
-    void fusesReaded(QMap<QString, quint8> fuses);
+    void fusesReaded();
+    void lockBitReaded();
     void verifyMismatch(QString what, int offset, int value_read, int value_file);
 
 private:

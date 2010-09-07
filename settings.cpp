@@ -29,6 +29,7 @@ Settings::Settings(QObject *parent) :
     rememberLastTab = settingsIni->value("rememberLastTab", true).toBool();
     defaultTabIndex = settingsIni->value("defaultTabIndex", 0).toInt();
     lastTabIndex = settingsIni->value("lastTabIndex", 0).toInt();
+    noicons = settingsIni->value("noicons", false).toBool();
     settingsIni->endGroup();
 
     settingsIni->beginGroup("programmerOptions");
@@ -57,6 +58,7 @@ Settings::~Settings()
     settingsIni->setValue("rememberLastTab", rememberLastTab);
     settingsIni->setValue("defaultTabIndex", defaultTabIndex);
     settingsIni->setValue("lastTabIndex", lastTabIndex);
+    settingsIni->setValue("noicons", noicons);
     settingsIni->endGroup();
 
     settingsIni->beginGroup("programmerOptions");
