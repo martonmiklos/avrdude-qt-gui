@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tabMain">
        <attribute name="title">
@@ -490,34 +490,99 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
-         <widget class="QGroupBox" name="groupBox_3">
+         <widget class="QGroupBox" name="groupBoxOscal">
           <property name="title">
            <string>Oscillator Calibration Byte</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
+           <item row="0" column="0" colspan="2">
             <widget class="QLabel" name="labelCalibrateFreq">
              <property name="text">
               <string>Calibrate for freqency</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QComboBox" name="comboBox"/>
+           <item row="1" column="0" colspan="2">
+            <widget class="QComboBox" name="comboBoxOscalFreq"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Value</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Address</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2" rowspan="2">
+            <widget class="QRadioButton" name="radioButtonFlash">
+             <property name="text">
+              <string>Flash</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="3">
+            <widget class="QPushButton" name="pushButtonReadOscal">
+             <property name="text">
+              <string>Read</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" rowspan="2">
+            <widget class="QLineEdit" name="lineEditOscalValue"/>
+           </item>
+           <item row="3" column="1" rowspan="2">
+            <widget class="QLineEdit" name="lineEditOscalAdress"/>
+           </item>
+           <item row="4" column="2">
+            <widget class="QRadioButton" name="radioButtonEEPROM">
+             <property name="text">
+              <string>EEPROM</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="3">
+            <widget class="QPushButton" name="pushButtonWriteOscal">
+             <property name="text">
+              <string>Write</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="4">
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
         </item>
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="tabHWInfo">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/gtk-info.svg</normaloff>:/gtk-info.svg</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>HW info</string>
-       </attribute>
       </widget>
       <widget class="QWidget" name="tabHWSettings">
        <attribute name="icon">
@@ -533,8 +598,152 @@
           <property name="title">
            <string>Voltages</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_11"/>
+          <layout class="QGridLayout" name="gridLayout_8">
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelVtarget">
+             <property name="text">
+              <string>VTarget:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="QSlider" name="horizontalSliderVTarget">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="labelAREF0">
+             <property name="text">
+              <string>AREF0:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" colspan="2">
+            <widget class="QSlider" name="horizontalSliderAREF0">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="labelAREF1">
+             <property name="text">
+              <string>AREF1:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1" colspan="2">
+            <widget class="QSlider" name="horizontalSliderAREF1">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QPushButton" name="pushButtonReadVoltages">
+             <property name="text">
+              <string>Read</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="QPushButton" name="pushButtonWriteVoltages">
+             <property name="text">
+              <string>Write</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="3">
+            <widget class="QDoubleSpinBox" name="doubleSpinBoxAREF1">
+             <property name="suffix">
+              <string> V</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="3">
+            <widget class="QDoubleSpinBox" name="doubleSpinBoxAREF0">
+             <property name="suffix">
+              <string> V</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QDoubleSpinBox" name="doubleSpinBoxVTarget">
+             <property name="suffix">
+              <string> V</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxClockGenerator">
+          <property name="title">
+           <string>Clock generator</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_12">
+           <item row="0" column="3">
+            <widget class="QLabel" name="labelClockValue">
+             <property name="text">
+              <string>0.0Mhz</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="3">
+            <widget class="QSlider" name="horizontalSliderClkGenVal">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QDoubleSpinBox" name="doubleSpinBoxClockValue"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="QPushButton" name="pushButtonReadClkGenVal">
+             <property name="text">
+              <string>Read</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QPushButton" name="pushButtonWriteClkGenVal">
+             <property name="text">
+              <string>Write</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
@@ -793,6 +1002,7 @@ p, li { white-space: pre-wrap; }
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;

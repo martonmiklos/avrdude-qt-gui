@@ -53,8 +53,10 @@ private:
     void fillProgrammersList();
     void calculateArgumentsLabelText();
     void fillDefaultTabComboBox();
+    void programmerSelected();
 
 private slots:
+    void on_horizontalSliderVTarget_sliderMoved(int position);
     void on_pushButtonProgramLockbits_clicked();
     void on_pushButtonReadLockbits_clicked();
     void on_checkBoxNoIcons_toggled(bool checked);

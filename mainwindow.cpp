@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // settings to gui
     settings = new Settings(this);
+    programmerSelected();
     ui->checkBoxNoIcons->hide();// FIXME workaround
     ui->lineEditAvrDudePath->setText(settings->dudePath);
     ui->lineEditXmlsPath->setText(settings->xmlsPath);
@@ -190,6 +191,32 @@ void MainWindow::fillDefaultTabComboBox()
                                         i);
     }
     ui->comboBoxDefaultTab->setCurrentIndex(settings->defaultTabIndex);
+}
+
+void MainWindow::programmerSelected()
+{
+    bool hwVisible = false;
+    if (settings->programmerName.contains("stk500")) {
+        ui->horizontalSliderVTarget->setMaximum(60);
+        ui->horizontalSliderVTarget->setSingleStep(1);
+        ui->doubleSpinBoxVTarget->setSingleStep(0.1);
+        ui->doubleSpinBoxVTarget->setMaximum(6.0);
+        ui->horizontalSliderAREF0->setMaximum(60);
+        hwVisible = true;
+        ui->horizontalSliderAREF1->setEnabled(false);
+        ui->labelAREF1->setEnabled(false);
+        ui->doubleSpinBoxAREF1->setEnabled(false);
+    } else if (settings->programmerName.contains("stk600")) {
+        ui->horizontalSliderVTarget->setMaximum(55);
+        ui->doubleSpinBoxVTarget->setMaximum(5.5);
+        ui->horizontalSliderAREF0->setMaximum(550);
+        ui->horizontalSliderAREF1->setMaximum(550);
+        hwVisible = true;
+        ui->horizontalSliderAREF1->setEnabled(true);
+        ui->labelAREF1->setEnabled(true);
+        ui->doubleSpinBoxAREF1->setEnabled(true);
+    }
+    ui->tabWidgetMain->setTabEnabled(5, hwVisible);
 }
 
 void MainWindow::reloadFuseView()
@@ -404,6 +431,7 @@ void MainWindow::on_comboBoxProgrammer_activated(int index)
 {
     settings->programmerName = ui->comboBoxProgrammer->itemData(index).toString();
     calculateArgumentsLabelText();
+    programmerSelected();
 }
 
 void MainWindow::on_comboBoxDevice_activated(int index)
@@ -708,4 +736,10 @@ void MainWindow::on_pushButtonProgramLockbits_clicked()
                    .arg(QString::number(avrPart->lockbyte.value, 16).rightJustified(2, '0')));
         avrProgrammer->programLockByte();
     }
+}
+
+void MainWindow::on_horizontalSliderVTarget_sliderMoved(int position)
+{
+    double voltage = position/10;
+    ui->doubleSpinBoxVTarget->setValue(voltage);
 }
