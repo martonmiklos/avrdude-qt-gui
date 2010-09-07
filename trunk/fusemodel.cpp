@@ -19,8 +19,6 @@ QVariant FuseModelCute::headerData(int section, Qt::Orientation orientation, int
 void FuseModelCute::reloadModel()
 {
     this->dataChanged(this->index(1,0), this->index(1, this->rowCount(this->index(-1, -1))));
-    this->reset();
-
 }
 
 Qt::ItemFlags FuseModelCute::flags(const QModelIndex &index) const
@@ -77,6 +75,7 @@ bool FuseModelCute::setData(const QModelIndex &index, const QVariant &value, int
                             }
                         }
                         part->fuseRegs[i].value |= part->fuseRegs[i].bitFields[j].value * (1<<l);
+                        emit changed();
                         return true;
                     } // we have found the searched bitfield
                     rowCounter++;
@@ -109,9 +108,6 @@ int FuseValuesModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-
-    if (currentMode == FuseBitDisplayMode_BinaryDetailed)
-        return part->fuseRegs.size()*2;
     return part->fuseRegs.size();
 }
 
@@ -119,35 +115,18 @@ int FuseValuesModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-
-    if (currentMode == FuseBitDisplayMode_BinaryDetailed)
-        return 9;
     return 2;
 }
 
 QVariant FuseValuesModel::data(const QModelIndex &index, int role) const
 {
-    if (currentMode == FuseBitDisplayMode_BinaryDetailed) {
-        if (index.row()%2 ==  1) { // value row
-            if ((index.column() == 0) && (role == Qt::DisplayRole)) {
-                return part->fuseRegs[(index.row() - 1)/2].name;
-            } else {
-                return (bool)(part->fuseRegs[(index.row() - 1)/2].value & (1<<(index.column()-1)));
-            }
-        } else { // bits name row
-            if (((index.column() > 0) && (index.column() < 9)) && (role == Qt::DisplayRole)) {
-                return part->getFuseRegisterBitName((index.row())/2, index.column()-1);
-            }
+    if (index.row() < part->fuseRegs.size()) {
+        if ((index.column() == 0) && (role == Qt::DisplayRole)) {
+            return part->fuseRegs[index.row()].name;
         }
-    } else {
-        if (index.row() < part->fuseRegs.size()) {
-            if ((index.column() == 0) && (role == Qt::DisplayRole)) {
-                return part->fuseRegs[index.row()].name;
-            }
 
-            if ((index.column() == 1) && (role == Qt::DisplayRole)) {
-                return part->fuseRegs[index.row()].value;
-            }
+        if ((index.column() == 1) && (role == Qt::DisplayRole)) {
+            return (int)part->fuseRegs[index.row()].value;
         }
     }
     return QVariant();
@@ -158,6 +137,7 @@ bool FuseValuesModel::setData(const QModelIndex &index, const QVariant &value, i
     if (index.row() < part->fuseRegs.size()) {
         if ((index.column() == 1) && (role == Qt::DisplayRole)){
             part->fuseRegs[index.row()].value = value.toInt();
+            emit changed();
             return true;
         }
     }
@@ -181,38 +161,15 @@ QVariant FuseValuesModel::headerData(int section, Qt::Orientation orientation, i
 
 Qt::ItemFlags FuseValuesModel::flags(const QModelIndex &index) const
 {
-    if (currentMode == FuseBitDisplayMode_BinaryDetailed) {
-        if (index.row() %2 == 0) {
-            return Qt::ItemIsEnabled;
-        } else {
-            if (index.column() > 0) {
-                return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
-            } else {
-                return Qt::ItemIsEnabled;
-            }
-        }
-    } else {
-        if (index.column() == 1) {
-            return Qt::ItemIsEditable | Qt::ItemIsEnabled;
-        }
+    if (index.column() == 1) {
+        return Qt::ItemIsEditable | Qt::ItemIsEnabled;
     }
     return Qt::ItemIsEnabled;
 }
 
 void FuseValuesModel::reloadModel()
 {
-    reset();
-}
-
-void FuseValuesModel::setDisplayMode(FuseBitDisplayMode mode)
-{
-    currentMode = mode;
-    if (mode == FuseBitDisplayMode_BinaryDetailed) {
-        emit dataChanged(this->index(0,0), this->index(part->fuseRegs.size()*2, 9));
-    } else {
-
-    }
-    this->reset();
+    this->dataChanged(this->index(1,0), this->index(1, this->rowCount(this->index(-1, -1))));
 }
 
 QVariant LockBitsModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -233,8 +190,6 @@ QVariant LockBitsModel::headerData(int section, Qt::Orientation orientation, int
 void LockBitsModel::reloadModel()
 {
     this->dataChanged(this->index(1,0), this->index(1, this->rowCount(this->index(-1, -1))));
-    this->reset();
-
 }
 
 Qt::ItemFlags LockBitsModel::flags(const QModelIndex &index) const

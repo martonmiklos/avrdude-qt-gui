@@ -9,13 +9,6 @@
 
 class AvrPart;
 
-typedef enum {
-    FuseBitDisplayMode_Decimal,
-    FuseBitDisplayMode_Hexadecimal,
-    FuseBitDisplayMode_Binary,
-    FuseBitDisplayMode_BinaryDetailed
-} FuseBitDisplayMode;
-
 class FuseBitField // represent a fusebitgroup (like CLKSEL)
 {
 public:
@@ -53,13 +46,15 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void reloadModel();
+signals:
+    void changed();
 };
 
 class FuseValuesModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    FuseValuesModel(AvrPart *pa, QObject *parent = 0) : QAbstractTableModel(parent), part(pa), currentMode(FuseBitDisplayMode_Decimal) {}
+    FuseValuesModel(AvrPart *pa, QObject *parent = 0) : QAbstractTableModel(parent), part(pa) {}
     AvrPart *part;
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
@@ -68,10 +63,8 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void reloadModel();
-    void setDisplayMode(FuseBitDisplayMode mode);
-
-private:
-    FuseBitDisplayMode currentMode;
+signals:
+    void changed();
 };
 
 class LockBitsModel : public QAbstractTableModel
