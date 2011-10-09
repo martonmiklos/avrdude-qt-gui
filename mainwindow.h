@@ -43,6 +43,7 @@ private:
     QMenu *textOutPutMenu;
 
     BitFieldDelegate *lockFieldDelegate, *fuseFieldDelegate;
+    RegisterValueDelegate *fuseValueDelegate;
 
 
     void fillDeviceList();
