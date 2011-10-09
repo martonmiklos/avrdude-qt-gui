@@ -233,7 +233,6 @@ void MainWindow::fillDeviceList()
     ui->comboBoxDevice->addItem("AT90S2313", "2313");
     ui->comboBoxDevice->addItem("AT90S2333", "2333");
     ui->comboBoxDevice->addItem("AT90S2343", "2343");
-    ui->comboBoxDevice->addItem("ATtiny22", "2343");
     ui->comboBoxDevice->addItem("AT90S4414", "4414");
     ui->comboBoxDevice->addItem("AT90S4433", "4433");
     ui->comboBoxDevice->addItem("AT90S4434", "4434");
@@ -290,6 +289,7 @@ void MainWindow::fillDeviceList()
     ui->comboBoxDevice->addItem("ATtiny12", "t12");
     ui->comboBoxDevice->addItem("ATtiny13", "t13");
     ui->comboBoxDevice->addItem("ATtiny15", "t15");
+    ui->comboBoxDevice->addItem("Attiny22", "2343");
     ui->comboBoxDevice->addItem("ATtiny2313", "t2313");
     ui->comboBoxDevice->addItem("ATtiny25", "t25");
     ui->comboBoxDevice->addItem("ATtiny26", "t26");
@@ -599,7 +599,8 @@ void MainWindow::on_pushButtonProgramFuses_clicked()
                 if (avrPart->fuseRegs[i]->bitFields[j].enumValues.value(avrPart->fuseRegs[i]->bitFields[j].value())
                     .contains("Ext", Qt::CaseInsensitive)) {
                     QMessageBox msgBox(QMessageBox::Warning, tr("Are you sure"), tr("It seems to be that you have selected external clock\n"
-                                                                                    "for clock source. You may brick you AVR if you do not\n"
+                                                                                    "for clock source.\n"
+                                                                                    "You may brick you AVR if you do not\n"
                                                                                     "have the external clock!\n"
                                                                                     "Do you really want to program these fuses?"));
                     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -724,6 +725,12 @@ void MainWindow::on_horizontalSliderVTarget_sliderMoved(int position)
 
 void MainWindow::deviceChanged()
 {
+    avrPart->fuseFieldsModel()->refresh();
+    avrPart->fusesModel()->refresh();
+
+    avrPart->lockByteFieldsModel()->refresh();
+    avrPart->lockByteModel()->refresh();
+
     //return;
     for (int i = 0; i<ui->tableViewFuseFields->model()->rowCount(); i++)
         ui->tableViewFuseFields->openPersistentEditor(avrPart->fuseFieldsModel()->index(i, 1));

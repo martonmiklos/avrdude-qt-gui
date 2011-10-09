@@ -23,7 +23,7 @@ void Register::setMaskedValue(quint8 mask, quint8 value)
 {
     quint8 nvalue = 0;
     quint8 offset = 0;
-    for (offset; offset<8; offset++) {
+    for (; offset<8; offset++) {
         if (mask & (1<<offset))
             break;
     }
@@ -104,8 +104,23 @@ Qt::ItemFlags RegistersModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEnabled;
 }
 
+void RegistersModel::setRegisters(QList<Register *> *regs)
+{
+    m_registers = regs;
+}
+
 void RegistersModel::refresh()
 {
+    if (m_registers == NULL)
+        return;
+
+    beginRemoveRows(this->index(0,0), 0, m_registerCnt);
+    endRemoveRows();
+
+    m_registerCnt = m_registers->size();
+
+    beginInsertRows(index(0,0), 0, m_registerCnt);
+    endInsertRows();
     reset();
 }
 
@@ -206,5 +221,15 @@ int RegisterFieldsModel::columnCount(const QModelIndex &parent) const
 
 void RegisterFieldsModel::refresh()
 {
+    if (m_registers == NULL)
+        return;
+
+    beginRemoveRows(this->index(0,0), 0, m_registerCnt);
+    endRemoveRows();
+
+    m_registerCnt = m_registers->size();
+
+    beginInsertRows(index(0,0), 0, m_registerCnt);
+    endInsertRows();
     reset();
 }
