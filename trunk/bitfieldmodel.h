@@ -90,9 +90,9 @@ class RegistersModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    RegistersModel(QObject *parent = 0) : QAbstractTableModel(parent), m_registers(NULL) {}
+    RegistersModel(QObject *parent = 0) : QAbstractTableModel(parent), m_registers(NULL), m_registerCnt(0) {}
 
-    void setRegisters(QList<Register*>* regs) {m_registers = regs;}
+    void setRegisters(QList<Register*>* regs);
 
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
@@ -103,6 +103,7 @@ public:
 
 private:
     QList<Register*> *m_registers;
+    int m_registerCnt;
 
 public slots:
     void refresh();
@@ -116,7 +117,7 @@ class RegisterFieldsModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    RegisterFieldsModel(QObject *parent = 0) : QAbstractTableModel(parent), m_registers(NULL) {}
+    RegisterFieldsModel(QObject *parent = 0) : QAbstractTableModel(parent), m_registers(NULL), m_registerCnt(0) {}
 
     void setRegisters(QList<Register*> *regs) {m_registers = regs;}
 
@@ -129,6 +130,7 @@ public:
 
 private:
     QList<Register*> *m_registers;
+    int m_registerCnt;
 
 public slots:
     void refresh();

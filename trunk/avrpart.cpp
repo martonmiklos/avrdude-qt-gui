@@ -8,7 +8,7 @@ AvrPart::AvrPart(Settings *sa, QString name, QObject *parent)
     dudePartNos["AT90S2313"]		=		"2313";
     dudePartNos["AT90S2333"]		=		"2333";
     dudePartNos["AT90S2343"]		=		"2343";
-    dudePartNos["ATTINY22"]		=		"2343";
+    dudePartNos["Attiny22"]		=		"2343";
     dudePartNos["AT90S4414"]		=		"4414";
     dudePartNos["AT90S4433"]		=		"4433";
     dudePartNos["AT90S4434"]		=		"4434";
@@ -294,6 +294,7 @@ bool AvrPart::fillFuseAndLockData()
                     }
                     currentFuseRegister->addBitField(currentBitField);
                 }
+                qWarning() << currentFuseRegister->name();
                 fuseRegs.append(currentFuseRegister);
             } // fuse for loo
         } // fuse key found or not
