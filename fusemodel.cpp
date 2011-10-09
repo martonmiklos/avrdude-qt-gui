@@ -1,7 +1,7 @@
 #include "fusemodel.h"
 #include <QDebug>
 
-QVariant FuseModelCute::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant BitFieldModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -16,12 +16,12 @@ QVariant FuseModelCute::headerData(int section, Qt::Orientation orientation, int
     }
 }
 
-void FuseModelCute::reloadModel()
+void BitFieldModel::reloadModel()
 {
-    this->dataChanged(this->index(1,0), this->index(1, this->rowCount(this->index(-1, -1))));
+    this->dataChanged(this->index(1,0), this->index(1, this->rowCount(this->index(-1, -1))-1));
 }
 
-Qt::ItemFlags FuseModelCute::flags(const QModelIndex &index) const
+Qt::ItemFlags BitFieldModel::flags(const QModelIndex &index) const
 {
     if (index.column() == 1) {
         return Qt::ItemIsEditable | Qt::ItemIsEnabled;
@@ -29,7 +29,7 @@ Qt::ItemFlags FuseModelCute::flags(const QModelIndex &index) const
     return Qt::ItemIsEnabled;
 }
 
-QVariant FuseModelCute::data(const QModelIndex &index, int role) const
+QVariant BitFieldModel::data(const QModelIndex &index, int role) const
 {
     int rowCounter = 0;
     for (int i = 0; i<part->fuseRegs.count(); i++) {
@@ -58,7 +58,7 @@ QVariant FuseModelCute::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool FuseModelCute::setData(const QModelIndex &index, const QVariant &value, int role)
+bool BitFieldModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     int rowCounter = 0;
     if ((role == Qt::DisplayRole)  || (role == Qt::EditRole)) {
@@ -86,7 +86,7 @@ bool FuseModelCute::setData(const QModelIndex &index, const QVariant &value, int
     return false;
 }
 
-int FuseModelCute::rowCount(const QModelIndex &parent) const
+int BitFieldModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
@@ -97,28 +97,28 @@ int FuseModelCute::rowCount(const QModelIndex &parent) const
     return rowCount;
 }
 
-int FuseModelCute::columnCount(const QModelIndex &parent) const
+int BitFieldModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
     return 2;
 }
 
-int FuseValuesModel::rowCount(const QModelIndex &parent) const
+int BitFieldValueModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
     return part->fuseRegs.size();
 }
 
-int FuseValuesModel::columnCount(const QModelIndex &parent) const
+int BitFieldValueModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
     return 2;
 }
 
-QVariant FuseValuesModel::data(const QModelIndex &index, int role) const
+QVariant BitFieldValueModel::data(const QModelIndex &index, int role) const
 {
     if (index.row() < part->fuseRegs.size()) {
         if ((index.column() == 0) && (role == Qt::DisplayRole)) {
@@ -132,7 +132,7 @@ QVariant FuseValuesModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool FuseValuesModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool BitFieldValueModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (index.row() < part->fuseRegs.size()) {
         if ((index.column() == 1) && (role == Qt::DisplayRole)){
@@ -144,7 +144,7 @@ bool FuseValuesModel::setData(const QModelIndex &index, const QVariant &value, i
     return false;
 }
 
-QVariant FuseValuesModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant BitFieldValueModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -159,7 +159,7 @@ QVariant FuseValuesModel::headerData(int section, Qt::Orientation orientation, i
     }
 }
 
-Qt::ItemFlags FuseValuesModel::flags(const QModelIndex &index) const
+Qt::ItemFlags BitFieldValueModel::flags(const QModelIndex &index) const
 {
     if (index.column() == 1) {
         return Qt::ItemIsEditable | Qt::ItemIsEnabled;
@@ -167,7 +167,7 @@ Qt::ItemFlags FuseValuesModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEnabled;
 }
 
-void FuseValuesModel::reloadModel()
+void BitFieldValueModel::reloadModel()
 {
     this->dataChanged(this->index(1,0), this->index(1, this->rowCount(this->index(-1, -1))));
 }

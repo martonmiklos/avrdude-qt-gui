@@ -69,7 +69,7 @@ void AvrProgrammer::readyReadDudeOutPut()
 
 void AvrProgrammer::processErrorSlot(QProcess::ProcessError error)
 {
-    qWarning() << error;
+    qWarning() << tr("Process error:") << error;
 }
 
 void AvrProgrammer::dudeFinished(int retcode)
@@ -136,7 +136,7 @@ void AvrProgrammer::dudeFinished(int retcode)
             QString fuseValues;
             if (!retcode) {
                 bool ok = true;
-                for (int i = 0; i<fusesToRead.size(); i++)  {
+                for (int i = 0; i<fusesToRead.size(); i++)  { // loop trough the Avrpart'
                     bool ok = false;
                     QFile currentFuseOutFile(QDir::tempPath()+"/"+fusesToRead[i]+".txt");
                     currentFuseOutFile.open(QFile::ReadOnly);
@@ -152,23 +152,8 @@ void AvrProgrammer::dudeFinished(int retcode)
                             fuseValues.append(", ");
 
                         for(int j = 0; j< currentPart->fuseRegs.size(); j++) {
-                            if (getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs[j].name) == fusesToRead[i]) {
-                                currentPart->fuseRegs[j].value = currentFuseValue;
-                                for (int k = 0; k<currentPart->fuseRegs[j].bitFields.count(); k++) {
-                                    if (currentPart->fuseRegs[j].bitFields[k].isEnum) {
-                                        currentPart->fuseRegs[j].bitFields[k].value =
-                                                (currentPart->fuseRegs[j].value & currentPart->fuseRegs[j].bitFields[k].mask);
-                                        int l;
-                                        for (l = 0; l<8; l++) {
-                                            if (currentPart->fuseRegs[j].bitFields[k].mask & (1<<l)) {
-                                                break;
-                                            }
-                                        }
-                                        currentPart->fuseRegs[j].bitFields[k].value = currentPart->fuseRegs[j].bitFields[k].value / (1<<l);
-                                    } else {
-                                        currentPart->fuseRegs[j].bitFields[k].value = ((currentPart->fuseRegs[j].value & currentPart->fuseRegs[j].bitFields[k].mask) != 0);
-                                    }
-                                }
+                            if (getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs.at(j)->name()) == fusesToRead[i]) {
+                                currentPart->fuseRegs[j]->setValue(currentFuseValue);
                                 break;
                             }
                         }
@@ -218,22 +203,7 @@ void AvrProgrammer::dudeFinished(int retcode)
                         emit taskFailed(tr("The lockbyte value is not hexadecimal in the %1 file")
                                         .arg(currentLockByteFile.fileName()));
                     } else {
-                        currentPart->lockbyte.value = lockbyte;
-                        for (int k = 0; k<currentPart->lockbyte.bitFields.count(); k++) {
-                            if (currentPart->lockbyte.bitFields[k].isEnum) {
-                                currentPart->lockbyte.bitFields[k].value =
-                                        (currentPart->lockbyte.value & currentPart->lockbyte.bitFields[k].mask);
-                                int l;
-                                for (l = 0; l<8; l++) {
-                                    if (currentPart->lockbyte.bitFields[k].mask & (1<<l)) {
-                                        break;
-                                    }
-                                }
-                                currentPart->lockbyte.bitFields[k].value = currentPart->lockbyte.bitFields[k].value / (1<<l);
-                            } else {
-                                currentPart->lockbyte.bitFields[k].value = ((currentPart->lockbyte.value & currentPart->lockbyte.bitFields[k].mask) != 0);
-                            }
-                        }
+                        currentPart->lockBytes.first()->setValue(lockbyte); // FIXME if we found AVR part with multiple lockbytes
                         emit taskFinishedOk(tr("Reading the lockbyte was successful (0x%1)")
                                             .arg(QString::number(lockbyte, 16).rightJustified(2, '0')));
                         emit lockBitReaded();
@@ -248,6 +218,9 @@ void AvrProgrammer::dudeFinished(int retcode)
     case DudeTaskNone: {
 
         } break;
+    default:
+        qWarning() << "TODO IMPLEMENT IT";
+        break;
     }
     currentDudeTask = DudeTaskNone;
 }
@@ -324,9 +297,9 @@ void AvrProgrammer::programFuses()
     currentDudeTask = DudeTaskWriteFuse;
     QString startString = staticProgrammerCommand();
     for (int i = 0; i<currentPart->fuseRegs.count(); i++) {
-        QString currentFuseArg = getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs[i].name);
+        QString currentFuseArg = getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs[i]->name());
         startString.append(" -U "+currentFuseArg+":w:"
-                           "0x"+QString::number(currentPart->fuseRegs[i].value, 16).rightJustified(2, '0')+":m");
+                           "0x"+QString::number(currentPart->fuseRegs[i]->value(), 16).rightJustified(2, '0')+":m");
     }
     avrDudeProcess->start(startString);
     emit avrDudeOut(startString);
@@ -354,7 +327,7 @@ void AvrProgrammer::programLockByte()
 {
     currentDudeTask = DudeTaskReadLock;
     QString startString = staticProgrammerCommand();
-    startString.append(" -U  lock:w:0x"+QString::number(currentPart->lockbyte.value, 16).rightJustified(2,'0')+":m");
+    startString.append(" -U  lock:w:0x"+QString::number(currentPart->lockBytes.first()->value(), 16).rightJustified(2,'0')+":m");
     avrDudeProcess->start(startString);
     emit avrDudeOut(startString);
 }
@@ -389,6 +362,8 @@ QString AvrProgrammer::staticProgrammerCommand()
     return ret;
 }
 
+
+// returns the fuse name in the avrdude's argument format.
 QString AvrProgrammer::getAvrDudeFuseNameFromXMLName(QString fuseName)
 {
     if (fuseName.toLower() == "high")

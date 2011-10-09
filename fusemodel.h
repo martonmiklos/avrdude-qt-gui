@@ -12,7 +12,7 @@ class AvrPart;
 class FuseBitField // represent a fusebitgroup (like CLKSEL)
 {
 public:
-    FuseBitField(){}
+    FuseBitField() : mask(0), value(0), isEnum(false) {}
     QString shortName, text;
     int mask;
     int value; // value is similar like in the XML file (right aligned)
@@ -20,7 +20,7 @@ public:
     QMap <int, QString> enumValues;// predefined group values & their name
 };
 
-Q_DECLARE_METATYPE(FuseBitField);
+Q_DECLARE_METATYPE(FuseBitField)
 
 class FuseRegister // represents a fuse byte (high,low, extended)
 {
@@ -33,12 +33,11 @@ public:
     int size;
 };
 
-class FuseModelCute : public QAbstractTableModel
+class RegisterFieldsModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    FuseModelCute(AvrPart *pa, QObject *parent = 0) : QAbstractTableModel(parent), part(pa) {}
-    AvrPart *part;
+    RegisterFieldsModel(QObject *parent = 0) : QAbstractTableModel(parent) {}
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -50,12 +49,11 @@ signals:
     void changed();
 };
 
-class FuseValuesModel : public QAbstractTableModel
+class RegisterValueModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    FuseValuesModel(AvrPart *pa, QObject *parent = 0) : QAbstractTableModel(parent), part(pa) {}
-    AvrPart *part;
+    RegisterValueModel(QObject *parent = 0) : QAbstractTableModel(parent){}
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;

@@ -4,89 +4,6 @@
 AvrPart::AvrPart(Settings *sa, QString name, QObject *parent)
     : QObject(parent), settings(sa)
 {
-    fillPartNosMap();
-    setPartName(name);
-}
-
-
-QString AvrPart::getSignature() const
-{
-    return QString("0x%1:0x%2:0x%3")
-                .arg(QString::number(sign0, 16).rightJustified(2, '0').toUpper())
-                .arg(QString::number(sign1, 16).rightJustified(2, '0').toUpper())
-                .arg(QString::number(sign2, 16).rightJustified(2, '0').toUpper());
-}
-
-bool AvrPart::setPartName(QString name)
-{
-    try {
-        domFile.setFileName(settings->xmlsPath+"/"+name+".xml");
-        if (!domFile.open(QFile::ReadOnly))  {
-            throw QString(tr("Could not open the %1 xml file")).arg(name+".xml");
-        }
-
-        if (!domDoc.setContent(&domFile)) {
-            domFile.close();
-            return false;
-        }
-        domFile.close();
-
-        QDomNode signatureNode = domDoc.elementsByTagName("SIGNATURE").item(0);
-        if (!signatureNode.isNull()) {
-            QDomNode byte = signatureNode.firstChild();
-            QDomElement currentElement;
-
-            while(!byte.isNull()) {
-                bool ok = false;
-                currentElement = byte.toElement();
-                if (currentElement.tagName() == "ADDR000") {
-                    sign0 = currentElement.text().right(2).toInt(&ok, 16);
-                } else if (currentElement.tagName() == "ADDR001") {
-                    sign1 = currentElement.text().right(2).toInt(&ok, 16);
-                } else if (currentElement.tagName() == "ADDR002") {
-                    sign2 = currentElement.text().right(2).toInt(&ok, 16);
-                    if (ok)
-                        break;
-                }
-
-                if (!ok) {
-                    throw QString(tr("Could not read signature byte"));
-                    return false;
-                }
-                byte = byte.nextSibling();
-            }
-        } else {
-            throw QString(tr("Could not find the <SIGNATURE> key in the %1.xml file")).arg(name);
-        }
-
-        avrdudePartNo = getAvrDudePartNo(name);
-        if (avrdudePartNo.isNull()) {
-            throw (QString(tr("Unsupported part")));
-        } else {
-            partNameStr = name;
-            if (!fillFuseModel()) {
-                throw QString(tr("Unable to read fuse information"));
-            }
-            return true;
-        }
-    } catch (QString ex) {
-        errorString = ex;
-        partNameStr = tr("Invalid xml file");
-        return false;
-    }
-}
-
-QString AvrPart::getAvrDudePartNo(QString name) const
-{
-    if (dudePartNos.contains(name.toUpper())) {
-        return dudePartNos.value(name.toUpper());
-    } else {
-        return QString();
-    }
-}
-
-void AvrPart::fillPartNosMap()
-{
     dudePartNos["AT90S1200"]		=		"1200";
     dudePartNos["AT90S2313"]		=		"2313";
     dudePartNos["AT90S2333"]		=		"2333";
@@ -183,11 +100,119 @@ void AvrPart::fillPartNosMap()
     dudePartNos["ATXMEGA64A1"]		=		"x64a1";
     dudePartNos["ATXMEGA64A3"]		=		"x64a3";
     dudePartNos["ATXMEGA64A4"]		=		"x64a4";
+
+    m_fusesModel = new RegistersModel(this);
+    m_fuseFieldsModel = new RegisterFieldsModel(this);
+
+    // cross connect the valuechange notifications
+    connect(m_fusesModel, SIGNAL(changed()), m_fuseFieldsModel, SLOT(refresh()));
+    connect(m_fuseFieldsModel, SIGNAL(changed()), m_fusesModel, SLOT(refresh()));
+
+    m_lockBytesModel = new RegistersModel(this);
+    m_lockByteFieldsModel = new RegisterFieldsModel(this);
+
+    // cross connect the valuechange notifications
+    connect(m_lockBytesModel, SIGNAL(changed()), m_lockByteFieldsModel, SLOT(refresh()));
+    connect(m_lockByteFieldsModel, SIGNAL(changed()), m_lockBytesModel, SLOT(refresh()));
+
+    // set the backend data structures
+    m_fusesModel->setRegisters(&fuseRegs);
+    m_fuseFieldsModel->setRegisters(&fuseRegs);
+
+
+    m_fuseFieldsModel->setRegisters(&fuseRegs);
+    m_lockByteFieldsModel->setRegisters(&fuseRegs);
+
+    setPartName(name); // do it only after the creating of the model objects
 }
 
-bool AvrPart::fillFuseModel()
+
+QString AvrPart::getSignature() const
 {
-    fuseRegs.clear();
+    return QString("0x%1:0x%2:0x%3")
+                .arg(QString::number(sign0, 16).rightJustified(2, '0').toUpper())
+                .arg(QString::number(sign1, 16).rightJustified(2, '0').toUpper())
+                .arg(QString::number(sign2, 16).rightJustified(2, '0').toUpper());
+}
+
+bool AvrPart::setPartName(QString name)
+{
+    try {
+        domFile.setFileName(settings->xmlsPath+"/"+name+".xml");
+        if (!domFile.open(QFile::ReadOnly))  {
+            throw QString(tr("Could not open the %1 xml file")).arg(name+".xml");
+        }
+
+        if (!domDoc.setContent(&domFile)) {
+            domFile.close();
+            return false;
+        }
+        domFile.close();
+
+        QDomNode signatureNode = domDoc.elementsByTagName("SIGNATURE").item(0);
+        if (!signatureNode.isNull()) {
+            QDomNode byte = signatureNode.firstChild();
+            QDomElement currentElement;
+
+            while(!byte.isNull()) {
+                bool ok = false;
+                currentElement = byte.toElement();
+                if (currentElement.tagName() == "ADDR000") {
+                    sign0 = currentElement.text().right(2).toInt(&ok, 16);
+                } else if (currentElement.tagName() == "ADDR001") {
+                    sign1 = currentElement.text().right(2).toInt(&ok, 16);
+                } else if (currentElement.tagName() == "ADDR002") {
+                    sign2 = currentElement.text().right(2).toInt(&ok, 16);
+                    if (ok)
+                        break;
+                }
+
+                if (!ok) {
+                    throw QString(tr("Could not read signature byte"));
+                    return false;
+                }
+                byte = byte.nextSibling();
+            }
+        } else {
+            throw QString(tr("Could not find the <SIGNATURE> key in the %1.xml file")).arg(name);
+        }
+
+        avrdudePartNo = getAvrDudePartNo(name);
+        if (avrdudePartNo.isNull()) {
+            throw (QString(tr("Unsupported part")));
+        } else {
+            partNameStr = name;
+            if (!fillFuseAndLockData()) {
+                throw QString(tr("Unable to read fuse information"));
+            }
+            return true;
+        }
+    } catch (QString ex) {
+        errorString = ex;
+        partNameStr = tr("Invalid xml file");
+        return false;
+    }
+}
+
+QString AvrPart::getAvrDudePartNo(QString name) const
+{
+    if (dudePartNos.contains(name.toUpper())) {
+        return dudePartNos.value(name.toUpper());
+    } else {
+        return QString();
+    }
+}
+
+bool AvrPart::fillFuseAndLockData()
+{
+    while (fuseRegs.size()) {
+        delete fuseRegs.takeFirst();
+    }
+
+    while (lockBytes.size()) {
+        delete lockBytes.takeFirst();
+    }
+
     try {
         domFile.setFileName(settings->xmlsPath+"/"+partNameStr+".xml");
         if (!domFile.open(QFile::ReadOnly))  {
@@ -233,37 +258,32 @@ bool AvrPart::fillFuseModel()
                 if (fuseRegElement.attribute("name").toAscii() == "")
                     break; // ignore the offset only fuseregs
 
-                FuseRegister currentFuseRegister(
+                Register *currentFuseRegister = new Register(
                         fuseRegElement.attribute("name"),
                         fuseRegElement.attribute("offset").toInt(),
                         fuseRegElement.attribute("size").toInt());
-                currentFuseRegister.value = 0;
 
-                for(int j = 0; j<registersFuseNode.childNodes().item(i).childNodes().count(); j++) {
+                for(int j = 0; j<registersFuseNode.childNodes().item(i).childNodes().count(); j++) { // loop trough the current fuseregister's bitfields
                     QDomElement fuseBitfieldElement = registersFuseNode.childNodes().item(i).childNodes().item(j).toElement();
-                    QString enumName = fuseBitfieldElement.attribute("enum", "");
-
-                    FuseBitField currentBitField;
-                    currentBitField.shortName = fuseBitfieldElement.attribute("name");
-                    bool ok;
-                    currentBitField.mask = fuseBitfieldElement.attribute("mask").toInt(&ok, 16);
-                    currentBitField.text = fuseBitfieldElement.attribute("text");
-                    currentBitField.isEnum = false;
-                    currentBitField.value = 0;
-                    if (enumName != "") {
-                        currentBitField.isEnum = true;
+                    bool ok = false;
+                    BitField currentBitField(fuseBitfieldElement.attribute("text"),
+                                             fuseBitfieldElement.attribute("name"),
+                                             fuseBitfieldElement.attribute("mask").toInt(&ok, 16),
+                                             0,
+                                             fuseBitfieldElement.attribute("enum", "") != "");
+                    //FIXME check ok
+                    if (currentBitField.isEnum()) {
                         QDomNodeList enumNodesList = registersFuseNode.parentNode().childNodes();
                         for (int k = 0; k<enumNodesList.count(); k++) {
                             QDomElement enumElement = enumNodesList.item(k).toElement();
                             if ((enumElement.tagName() == "enumerator") &&
-                                (enumElement.attribute("name") == enumName)) {
+                                (enumElement.attribute("name") == fuseBitfieldElement.attribute("enum", ""))) {
                                 for (int l = 0; l<enumElement.childNodes().count(); l++) {
                                     QDomElement enumItemElement = enumElement.childNodes().item(l).toElement();
                                     bool ok = false;
                                     int val = enumItemElement.attribute("val").remove("0x").toInt(&ok,16);
                                     if (ok) {
-                                        QString text = enumItemElement.attribute("text");
-                                        currentBitField.enumValues[val] = text;
+                                        currentBitField.addEnumValue(val, enumItemElement.attribute("text"));
                                     } else {
                                         qWarning() << tr("%1 is not a hexadecimal number").arg(enumItemElement.attribute("val"));
                                     }
@@ -272,38 +292,34 @@ bool AvrPart::fillFuseModel()
                             }
                         }
                     }
-                    currentFuseRegister.bitFields.append(currentBitField);
+                    currentFuseRegister->addBitField(currentBitField);
                 }
                 fuseRegs.append(currentFuseRegister);
-            }
-            emit reloadFuseView();
-        }
+            } // fuse for loo
+        } // fuse key found or not
 
         if (!regLockBitFound) {
             throw QString(tr("Cannot found the LOCKBITS key"));
         } else {
-            for(int i = 0; i<1/*lockBitsNode.childNodes().count()*/; i++) {
+            for(int i = 0; i<lockBitsNode.childNodes().count(); i++) {
                 QDomElement lockBitElement = lockBitsNode.childNodes().item(i).toElement();
                 if (lockBitElement.attribute("name").toAscii() == "")
                     break; // ignore the offset only lockbits
-                this->lockbyte.bitFields.clear();
-                this->lockbyte.name = lockBitElement.attribute("name"),
-                this->lockbyte.offset = lockBitElement.attribute("offset").toInt();
-                this->lockbyte.size = lockBitElement.attribute("size").toInt();
-                this->lockbyte.value = 0;
-
+                Register *currentLockByte = new Register(lockBitElement.attribute("name", tr("Name field empty")),
+                                        lockBitElement.attribute("offset").toInt(),
+                                        lockBitElement.attribute("size").toInt());
+                //FIXME check ok
                 for(int j = 0; j<lockBitsNode.childNodes().item(i).childNodes().count(); j++) {
                     QDomElement lockBitBitfieldElement = lockBitsNode.childNodes().item(i).childNodes().item(j).toElement();
                     QString enumName = lockBitBitfieldElement.attribute("enum", "");
+                    bool ok = false;
+                    BitField currentBitField(lockBitBitfieldElement.attribute("text"),
+                                             lockBitBitfieldElement.attribute("name"),
+                                             lockBitBitfieldElement.attribute("mask").toInt(&ok, 16),
+                                             0,
+                                             lockBitBitfieldElement.attribute("enum", "") == "");
 
-                    LockBitField currentBitField;
-                    currentBitField.shortName = lockBitBitfieldElement.attribute("name");
-                    bool ok;
-                    currentBitField.mask = lockBitBitfieldElement.attribute("mask").toInt(&ok, 16);
-                    currentBitField.text = lockBitBitfieldElement.attribute("text");
-                    currentBitField.isEnum = false;
-                    if (enumName != "") {
-                        currentBitField.isEnum = true;
+                    if (lockBitBitfieldElement.attribute("enum", "") != "") {
                         QDomNodeList enumNodesList = lockBitsNode.parentNode().childNodes();
                         for (int k = 0; k<enumNodesList.count(); k++) {
                             QDomElement enumElement = enumNodesList.item(k).toElement();
@@ -314,107 +330,17 @@ bool AvrPart::fillFuseModel()
                                     bool ok = false;
                                     int val = enumItemElement.attribute("val").remove("0x").toInt(&ok,16);
                                     if (ok) {
-                                        QString text = enumItemElement.attribute("text");
-                                        currentBitField.enumValues[val] = text;
+                                        currentBitField.addEnumValue(val, enumItemElement.attribute("text", tr("Unable to read enum key value")));
                                     }
                                 }
                                 break;
                             }
                         }
                     }
-                    this->lockbyte.bitFields.append(currentBitField);
+                    currentLockByte->addBitField(currentBitField);
                 }
+                lockBytes.append(currentLockByte);
             }
-            emit reloadFuseView();
-        }
-    } catch (QString ex) {
-        errorString = ex;
-        qWarning() << ex;
-        return false;
-    }
-    return true;
-}
-
-bool AvrPart::fillLockBitModel()
-{
-    try {
-        domFile.setFileName(settings->xmlsPath+"/"+partNameStr+".xml");
-        if (!domFile.open(QFile::ReadOnly))  {
-            throw QString(tr("Could not open the %1 xml file")).arg(partNameStr+".xml");
-        }
-
-        if (!domDoc.setContent(&domFile)) {
-            domFile.close();
-            return false;
-        }
-        domFile.close();
-
-        QDomNode registersFuseNode;
-        bool regFuseFound = false;
-        QDomNodeList v2List = domDoc.elementsByTagName("V2");
-        if (v2List.size() == 0) {
-            throw (tr("Could not find the V2 tag in the xml file. Maybe you should update it to a newer one."));
-        }
-
-        QDomNodeList list =  v2List.at(0).toElement().elementsByTagName("registers");
-        for (int i = 0; i<list.size() ;i++){
-            if (list.item(i).toElement().attribute("memspace") == "FUSE"){
-                regFuseFound = true;
-                registersFuseNode = list.item(i);
-                break;
-            }
-        }
-
-        if (!regFuseFound) {
-            throw QString("Cannot found the FUSE module key");
-        } else {
-            // this will iterate on the High low, extended fuses or on fuse[N] keys at xmega devices
-            for(int i = 0; i<registersFuseNode.childNodes().count(); i++) {
-                QDomElement fuseRegElement = registersFuseNode.childNodes().item(i).toElement();
-                if (fuseRegElement.attribute("name").toAscii() == "")
-                    break; // ignore the offset only fuseregs
-
-                FuseRegister currentFuseRegister(
-                        fuseRegElement.attribute("name"),
-                        fuseRegElement.attribute("offset").toInt(),
-                        fuseRegElement.attribute("size").toInt());
-                currentFuseRegister.value = 0;
-
-                for(int j = 0; j<registersFuseNode.childNodes().item(i).childNodes().count(); j++) {
-                    QDomElement fuseBitfieldElement = registersFuseNode.childNodes().item(i).childNodes().item(j).toElement();
-                    QString enumName = fuseBitfieldElement.attribute("enum", "");
-
-                    FuseBitField currentBitField;
-                    currentBitField.shortName = fuseBitfieldElement.attribute("name");
-                    bool ok;
-                    currentBitField.mask = fuseBitfieldElement.attribute("mask").toInt(&ok, 16);
-                    currentBitField.text = fuseBitfieldElement.attribute("text");
-                    currentBitField.isEnum = false;
-                    if (enumName != "") {
-                        currentBitField.isEnum = true;
-                        QDomNodeList enumNodesList = registersFuseNode.parentNode().childNodes();
-                        for (int k = 0; k<enumNodesList.count(); k++) {
-                            QDomElement enumElement = enumNodesList.item(k).toElement();
-                            if ((enumElement.tagName() == "enumerator") &&
-                                (enumElement.attribute("name") == enumName)) {
-                                for (int l = 0; l<enumElement.childNodes().count(); l++) {
-                                    QDomElement enumItemElement = enumElement.childNodes().item(l).toElement();
-                                    bool ok = false;
-                                    int val = enumItemElement.attribute("val").remove("0x").toInt(&ok,16);
-                                    if (ok) {
-                                        QString text = enumItemElement.attribute("text");
-                                        currentBitField.enumValues[val] = text;
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    currentFuseRegister.bitFields.append(currentBitField);
-                }
-                fuseRegs.append(currentFuseRegister);
-            }
-            emit reloadFuseView();
         }
     } catch (QString ex) {
         errorString = ex;
@@ -443,7 +369,7 @@ QString AvrPart::findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2)
 
         if (!domDoc.setContent(&domFile)) {
             domFile.close();
-            return false;
+            return "";
         }
         domFile.close();
 
@@ -479,30 +405,10 @@ QString AvrPart::findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2)
 QStringList AvrPart::getSupportedFuses()
 {
     QStringList ret;
-    foreach (FuseRegister fr, fuseRegs) {
-        ret.append(fr.name);
+    foreach (Register *fr, fuseRegs) {
+        ret.append(fr->name());
     }
     return ret;
 }
 
-QString AvrPart::getFuseRegisterBitName(QString fuseReg, int bitnum)
-{
-    for (int i = 0; i<fuseRegs.size(); i++) {
-        if (fuseRegs[i].name == fuseReg) {
-            return getFuseRegisterBitName(i, bitnum);
-        }
-    }
-    return "";
-}
-
-QString AvrPart::getFuseRegisterBitName(int fuseRegNum, int bitnum)
-{
-    foreach (FuseBitField fb, fuseRegs[fuseRegNum].bitFields) {
-        if ((fb.mask) & (1<<bitnum)) {
-            QString ret = fb.shortName+QString::number(bitnum);
-            return ret;
-        }
-    }
-    return "";
-}
 

@@ -17,8 +17,10 @@ SOURCES += main.cpp\
     avrprogrammer.cpp \
     avrpart.cpp \
     mainwindow.cpp \
-    fusemodel.cpp \
-    fusedelegate.cpp
+ #   fusemodel.cpp \
+ #   fusedelegate.cpp \
+    bitfieldmodel.cpp \
+    bitfielddelegate.cpp
 
 HEADERS  += \
     partdeschandler.h \
@@ -26,10 +28,12 @@ HEADERS  += \
     avrprogrammer.h \
     avrpart.h \
     mainwindow.h \
-    dudepartnos.h \
+#    dudepartnos.h \
     hexlineedit.h \
-    fusemodel.h \
-    fusedelegate.h
+#    fusemodel.h \
+#    fusedelegate.h \
+    bitfieldmodel.h \
+    bitfielddelegate.h
 
 FORMS    += \
     mainwindow.ui
