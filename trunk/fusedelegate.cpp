@@ -1,27 +1,30 @@
 #include "fusedelegate.h"
 
+
 QWidget *FuseDelegate::createEditor(QWidget *parent,
     const QStyleOptionViewItem & option,
     const QModelIndex & index) const
 {
-    FuseBitField field = index.model()->data(index, Qt::UserRole).value<FuseBitField>();
-    if (field.isEnum) {
-        QComboBox *editor = new QComboBox(parent);
+    BitField field = index.model()->data(index, Qt::UserRole).value<BitField>();
+    if (field.isEnum()) {
+        FuseComboBox *editor = new FuseComboBox(parent);
+        connect(editor, SIGNAL(activated(int)), this, SLOT(commitSlot()));
         editor->setAutoFillBackground(true);
         int current = 0;
         QMapIterator<int, QString> i(field.enumValues);
         while (i.hasNext()) {
             i.next();
             editor->addItem(i.value(), i.key());
-            if (field.value == i.key())
+            if (field.value() == i.key())
                 current = i.key();
         }
         editor->setCurrentIndex(current);
         return editor;
     } else {
-        QCheckBox *editor = new QCheckBox(parent);
+        FuseCheckBox *editor = new FuseCheckBox(parent);
+        connect(editor, SIGNAL(commitDataSignal(QWidget*)), this, SIGNAL(commitData(QWidget*)));
         editor->setAutoFillBackground(true);
-        editor->setChecked(field.value != 0);
+        editor->setChecked(field.value() == 0);
         return editor;
     }
     return QStyledItemDelegate::createEditor(parent, option, index);
@@ -30,15 +33,15 @@ QWidget *FuseDelegate::createEditor(QWidget *parent,
 
 void FuseDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    FuseBitField field = index.model()->data(index, Qt::UserRole).value<FuseBitField>();
-    if (field.isEnum) {
-        QComboBox *cb = static_cast<QComboBox*>(editor);
+    BitField field = index.model()->data(index, Qt::UserRole).value<BitField>();
+    if (field.isEnum()) {
+        FuseComboBox *cb = static_cast<FuseComboBox*>(editor);
         cb->setAutoFillBackground(true);
-        cb->setCurrentIndex(cb->findData(field.value));
+        cb->setCurrentIndex(cb->findData(field.value()));
     } else {
-        QCheckBox *cb = static_cast<QCheckBox*>(editor);
+        FuseCheckBox *cb = static_cast<FuseCheckBox*>(editor);
         cb->setAutoFillBackground(true);
-        cb->setChecked(field.value != 0);
+        cb->setChecked(field.value() == 0);
     }
 }
 
@@ -47,12 +50,12 @@ void FuseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                    const QModelIndex &index) const
 {
     int value = 0;
-    FuseBitField field = index.model()->data(index, Qt::UserRole).value<FuseBitField>();
-    if (field.isEnum) {
-        QComboBox *cb = static_cast<QComboBox*>(editor);
+    BitField field = index.model()->data(index, Qt::UserRole).value<BitField>();
+    if (field.isEnum()) {
+        FuseComboBox *cb = static_cast<FuseComboBox*>(editor);
         value = cb->itemData(cb->currentIndex()).toInt();
     } else {
-        QCheckBox *cb = static_cast<QCheckBox*>(editor);
+        FuseCheckBox *cb = static_cast<FuseCheckBox*>(editor);
         if (cb->isChecked())
             value = 1;
     }
@@ -63,7 +66,7 @@ QWidget *FuseValueDelegate::createEditor(QWidget *parent,
     const QStyleOptionViewItem & /*option*/,
     const QModelIndex & index) const
 {
-    QLineEdit *editor = new QLineEdit(parent);
+    FuseValueLineEdit *editor = new FuseValueLineEdit(parent);
     int value = index.model()->data(index).toInt();
     editor->setAutoFillBackground(true);
     switch (currentDisplayMode) {
@@ -87,7 +90,7 @@ QWidget *FuseValueDelegate::createEditor(QWidget *parent,
 void FuseValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     int value = index.model()->data(index).toInt();
-    QLineEdit *cb = static_cast<QLineEdit*>(editor);
+    FuseValueLineEdit *cb = static_cast<FuseValueLineEdit*>(editor);
     switch (currentDisplayMode) {
     case Hexadecimal:
         cb->setInputMask("0xHH;_");
@@ -110,7 +113,7 @@ void FuseValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 {
     int value = 0;
     bool ok = false;
-    QLineEdit *le = static_cast<QLineEdit*>(editor);
+    FuseValueLineEdit *le = static_cast<FuseValueLineEdit*>(editor);
     QString valueText = le->text();
     switch (currentDisplayMode) {
     case Hexadecimal:
@@ -140,7 +143,7 @@ QWidget *LockDelegate::createEditor(QWidget *parent,
     const QStyleOptionViewItem & option,
     const QModelIndex & index) const
 {
-    LockBitField field = index.model()->data(index, Qt::UserRole).value<LockBitField>();
+    BitField field = index.model()->data(index, Qt::UserRole).value<LockBitField>();
     if (field.isEnum) {
         QComboBox *editor = new QComboBox(parent);
         editor->setAutoFillBackground(true);

@@ -12,8 +12,9 @@
 #include "avrprogrammer.h"
 #include "settings.h"
 #include "avrpart.h"
-#include "fusemodel.h"
-#include "fusedelegate.h"
+#include "bitfielddelegate.h"
+#include "bitfieldmodel.h"
+
 
 namespace Ui {
     class MainWindow;
@@ -41,14 +42,8 @@ private:
     QLabel *statusBarLabel;
     QMenu *textOutPutMenu;
 
-    FuseModelCute *fuseModel;
-    FuseDelegate *fuseDelegate;
+    BitFieldDelegate *lockFieldDelegate, *fuseFieldDelegate;
 
-    LockBitsModel *locksModel;
-    LockDelegate *lockDelegate;
-
-    FuseValuesModel *fuseValuesModel;
-    FuseValueDelegate *fuseValueDelegate;
 
     void fillDeviceList();
     void fillProgrammersList();
@@ -96,10 +91,9 @@ private slots:
     void signatureRead(quint8 s0, quint8 s1, quint8 s2);
     void logMessage(QString msg);
     void logError(QString msg);
-    void reloadFuseView();
-    void reloadLocksView();
     void progressStep();
     void verifyFailed(QString what, int offset, int value_read, int value_waited);
+    void deviceChanged(); // a slot to open all delegate on the fuse and lockbytefield tableviews
 };
 
 #endif // MAINWINDOW_H

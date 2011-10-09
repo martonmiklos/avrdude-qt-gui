@@ -8,54 +8,11 @@
 #include <QDebug>
 #include <QStringList>
 #include "settings.h"
-#include "fusemodel.h"
-
-class FuseRegister;
-
-class LockBitField
-{
-public:
-    LockBitField(){}
-    QString shortName, text;
-    int mask;
-    int value; // value is similar like in the XML file (right aligned)
-    bool isEnum;
-    QMap <int, QString> enumValues;// predefined group values & their name
-};
-
-Q_DECLARE_METATYPE(LockBitField);
-
-class LockRegister
-{
-public:
-    LockRegister(){}
-    //LockRegister(QString name, int offset, int size) :name(name), offset(offset), size(size){}
-    QList<LockBitField> bitFields;
-    quint8 value;
-    QString name;
-    int offset;
-    int size;
-};
+#include "bitfieldmodel.h"
 
 class AvrPart : public QObject
 {
     Q_OBJECT
-private:
-    // avr related variables
-    QString partNameStr;
-    QString avrdudePartNo;
-
-    QString errorString;
-    QDomDocument domDoc;
-    QFile domFile;
-
-    void fillPartNosMap(); // FIXME make it static
-    bool fillFuseModel();
-    bool fillLockBitModel();
-    bool findXml(QString);
-    QMap<QString, QString> dudePartNos;
-    Settings *settings;
-
 public:
     AvrPart(Settings *sa, QString name, QObject *parent = 0);
     QString getPartName() const {return partNameStr;}
@@ -66,13 +23,38 @@ public:
     quint8 sign0, sign1, sign2; // signature bytes
     QString findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2);
     QStringList getSupportedFuses();
-    QList <FuseRegister> fuseRegs;
-    LockRegister lockbyte;
-    QString getFuseRegisterBitName(QString fuseReg, int bitnum);
-    QString getFuseRegisterBitName(int fuseReg, int bitnum);
 
-signals:
-    void reloadFuseView();
+    // FIXME make PPP
+    QList <Register*> fuseRegs;
+    QList <Register*> lockBytes;
+
+    RegistersModel* fusesModel() const {return m_fusesModel;}
+    RegisterFieldsModel *fuseFieldsModel() const {return m_fuseFieldsModel;}
+
+    RegistersModel* lockByteModel() const {return m_lockBytesModel;}
+    RegisterFieldsModel *lockByteFieldsModel() const {return m_lockByteFieldsModel;}
+
+private:
+    // avr related variables
+    QString partNameStr; // teh normal name of the controller (for e.g Atmega8)
+    QString avrdudePartNo; // the partname in avrdude option stlyle representation (for e.g. m8 for Atmega8)
+
+    QString errorString;
+
+    // misc xml handling variables
+    QDomDocument domDoc;
+    QFile domFile;
+
+    bool fillFuseAndLockData();
+    bool findXml(QString);
+    QMap<QString, QString> dudePartNos;
+    Settings *settings;
+
+    RegistersModel *m_fusesModel;
+    RegisterFieldsModel *m_fuseFieldsModel;
+
+    RegistersModel *m_lockBytesModel;
+    RegisterFieldsModel *m_lockByteFieldsModel;
 };
 
 #endif // AVRPART_H
