@@ -4,8 +4,10 @@
 #include <QCheckBox>
 #include <QStyledItemDelegate>
 #include <QComboBox>
+#include <QSpinBox>
 #include <QDebug>
 #include <QLineEdit>
+#include <QRegExpValidator>
 
 #include "bitfieldmodel.h"
 
@@ -55,6 +57,63 @@ public:
         editor->setGeometry(option.rect);
     }
 
+private slots:
+    void commitSlot(QWidget *editor) {commitData(editor);}
+signals:
+
+};
+
+
+class RegisterValueSpinBox : public QSpinBox
+{
+    Q_OBJECT
+public:
+    enum InputType {
+        Decimal = 10,
+        HexaDecimal = 16,
+        Binary = 2
+    };
+
+    RegisterValueSpinBox(QWidget *parent = 0);
+    void setInputType(RegisterValueSpinBox::InputType type);
+    InputType inputType() const {return m_inputType;}
+protected:
+    QValidator::State validate(QString &input, int &pos) const;
+    int valueFromText(const QString &text) const;
+    QString textFromValue(int val) const;
+
+private:
+    InputType m_inputType;
+    QRegExpValidator *validator;
+
+private slots:
+    void valueChangedSlot(int) {emit commitDataSignal(this);}
+signals:
+    void commitDataSignal(QWidget*);
+};
+
+
+class RegisterValueDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    explicit RegisterValueDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {}
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor,
+                              const QStyleOptionViewItem &option, const QModelIndex &) const
+    {
+        editor->setGeometry(option.rect);
+    }
+    void setInputType(RegisterValueSpinBox::InputType type) {m_inputType = type;}
+
+private:
+    RegisterValueSpinBox::InputType m_inputType;
 private slots:
     void commitSlot(QWidget *editor) {commitData(editor);}
 signals:

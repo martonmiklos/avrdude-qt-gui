@@ -48,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(avrPart->fusesModel(), SIGNAL(changed()), this, SLOT(deviceChanged()));
     ui->tableViewFuseFields->setModel(avrPart->fuseFieldsModel());
 
+    fuseValueDelegate = new RegisterValueDelegate(this);
+    ui->tableViewFuses->setItemDelegateForColumn(1, fuseValueDelegate);
+
     fuseFieldDelegate = new BitFieldDelegate(this);
     ui->tableViewFuseFields->setItemDelegateForColumn(1, fuseFieldDelegate);
     ui->tableViewFuseFields->horizontalHeader()->setStretchLastSection(true);
@@ -686,6 +689,25 @@ void MainWindow::on_textEditMessages_anchorClicked(QUrl link)
 
 void MainWindow::on_comboBoxFuseDisplaymode_activated(int index)
 {
+    for (int i = 0; i<ui->tableViewFuses->model()->rowCount(); i++) {
+        ui->tableViewFuses->closePersistentEditor(avrPart->fuseFieldsModel()->index(i, 1));
+    }
+
+    switch (index) {
+    case 0:
+        fuseValueDelegate->setInputType(RegisterValueSpinBox::HexaDecimal);
+        break;
+    case 1:
+        fuseValueDelegate->setInputType(RegisterValueSpinBox::Binary);
+        break;
+    case 2:
+        fuseValueDelegate->setInputType(RegisterValueSpinBox::Decimal);
+        break;
+    }
+
+    for (int i = 0; i<ui->tableViewFuses->model()->rowCount(); i++) {
+        ui->tableViewFuses->openPersistentEditor(avrPart->fuseFieldsModel()->index(i, 1));
+    }
 }
 
 void MainWindow::on_checkBoxNoIcons_toggled(bool checked)
@@ -737,5 +759,6 @@ void MainWindow::deviceChanged()
 
     for (int i = 0; i<ui->tableViewLockBitFields->model()->rowCount(); i++)
         ui->tableViewLockBitFields->openPersistentEditor(avrPart->lockByteFieldsModel()->index(i, 1));
-}
 
+    on_comboBoxFuseDisplaymode_activated(ui->comboBoxFuseDisplaymode->currentIndex());
+}
