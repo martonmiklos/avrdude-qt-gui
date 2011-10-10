@@ -403,6 +403,7 @@ QString AvrPart::findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2)
     return QString("");
 }
 
+// FIXME generate list on device change
 QStringList AvrPart::getSupportedFuses()
 {
     QStringList ret;

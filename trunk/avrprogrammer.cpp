@@ -4,7 +4,7 @@
 #include <QStringList>
 #include <QString>
 AvrProgrammer::AvrProgrammer(Settings *sa, AvrPart *part, QObject *parent)
-    : QObject(parent), currentPart(part), settings(sa)
+    : QObject(parent), currentPart(part), settings(sa), isTerminalMode(true)
 {
     if (friendlyName.isEmpty())
         friendlyName = avrDudeName;
@@ -32,6 +32,7 @@ void AvrProgrammer::readSignature()
 void AvrProgrammer::readyReadDudeOutPut()
 {
     QByteArray outPut = avrDudeProcess->readAllStandardOutput();
+    qWarning() << outPut << "\n";
     emit avrDudeOut(outPut);
     if ((currentDudeTask == DudeTaskReadFlash)      ||
         (currentDudeTask == DudeTaskWriteFlash)     ||
@@ -64,6 +65,51 @@ void AvrProgrammer::readyReadDudeOutPut()
             else if (currentDudeTask == DudeTaskVerifyFlash)
                 emit verifyMismatch("flash", offset, readVal, fileVal);
         }
+    }
+
+    if (isTerminalMode) {
+        switch (currentDudeTask) {
+        case DudeTaskSetVoltages:
+            if (outPut.startsWith("avrdude>")) {
+                if (currentDudeTask == DudeTaskSetVoltages) {
+                    QString cmd;
+                    switch (setVoltageStepCnt) {
+                    case 3:
+                        cmd = QString("vtarg %1\n").arg(vTarget);
+                        break;
+                    case 2:
+                        cmd = QString("varef 0 %1\n").arg(aref0);
+                        break;
+                    case 1:
+                        cmd = QString("varef 0 %1\n").arg(aref0);
+                        break;
+                    case 0:
+                        cmd = "quit\n";
+                        break;
+                    }
+                    avrDudeProcess->write(cmd.toAscii());
+                    setVoltageStepCnt--;
+                }
+            }
+            break;
+        case DudeTaskGetVoltages:
+            if (outPut.startsWith("avrdude>")) {
+                if (getValueCMDSent) {
+                    avrDudeProcess->write("quit\n");
+
+                } else {
+                    avrDudeProcess->write("parms\n");
+                    getValueCMDSent = true;
+                }
+            } else if (getValueCMDSent) {
+
+            }
+            break;
+        default:
+            qWarning() << "we cannot get here it is a bug";
+            break;
+        }
+
     }
 }
 
@@ -129,7 +175,7 @@ void AvrProgrammer::dudeFinished(int retcode)
             emit taskFinishedOk("Verification of the flash memory was successful.");
         } else {
             emit taskFailed(QString(tr("Verifying the flash memory failed: avrdude retcode: %1.\n"
-                                       "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
+                                       "Check the <a href=\"tab_dudeout\">AVRDude output tab </a> for details")).arg(retcode));
         }
         break;
     case DudeTaskReadFuse: {
@@ -177,7 +223,12 @@ void AvrProgrammer::dudeFinished(int retcode)
             }
         } break;
     case DudeTaskVerifyFuse: {
-
+            if (!retcode) {
+                emit taskFinishedOk("The setted fuse values matched the fuses in the device");
+            } else {
+                emit taskFailed(QString(tr("Fuse bits mismatch in the device.\n"
+                                           "Check the <a href=\"tab_dudeout\">AVRDude output tab </a> for details")));
+            }
         } break;
     case DudeTaskReadEEPROM: {
 
@@ -187,7 +238,7 @@ void AvrProgrammer::dudeFinished(int retcode)
                 emit taskFinishedOk(tr("Verification of the EEPROM memory was successful."));
             } else {
                 emit taskFailed(QString(tr("EEPROM verification failed: avrdude retcode: %1.\n"
-                                           "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
+                                           "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
             }
         } break;
     case DudeTaskWriteEEPROM: {
@@ -214,6 +265,22 @@ void AvrProgrammer::dudeFinished(int retcode)
                 }
             } else {
                 emit taskFailed(tr("Failed to read the lock byte"));
+            }
+        } break;
+    case DudeTaskSetVoltages: {
+            if (!retcode) {
+                emit taskFinishedOk(tr("Programming voltages had been set successfully."));
+            } else {
+                emit taskFailed(QString(tr("Unable to set programmer voltages: avrdude returned with error-code: %1.\n"
+                                           "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
+            }
+        } break;
+    case DudeTaskGetVoltages: {
+            if (!retcode) {
+                emit taskFinishedOk(tr("Programming voltages had been readed successfully."));
+            } else {
+                emit taskFailed(QString(tr("Unable to read programmer voltages: avrdude returned with error-code: %1.\n"
+                                           "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
             }
         } break;
     case DudeTaskNone: {
@@ -324,6 +391,20 @@ void AvrProgrammer::readFuses(QStringList fuseList)
     emit avrDudeOut(startString);
 }
 
+void AvrProgrammer::verifyFuses()
+{
+    currentDudeTask = DudeTaskVerifyFuse;
+    QString startString = staticProgrammerCommand();
+    fusesToRead.clear();
+    for (int i = 0; i<currentPart->fuseRegs.size(); i++)  {
+        QString currentFuseArg = getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs[i]->name());
+        fusesToRead.append(currentFuseArg);
+        startString.append(" -U "+currentFuseArg+":v:0x"+QString::number(currentPart->fuseRegs.at(i)->value(), 16).rightJustified(2, '0')+":m");
+    }
+    avrDudeProcess->start(startString);
+    emit avrDudeOut(startString);
+}
+
 void AvrProgrammer::programLockByte()
 {
     currentDudeTask = DudeTaskReadLock;
@@ -423,3 +504,28 @@ int AvrProgrammer::getFirstHexNumberFromStr(QString str, bool &success, int &num
     return -1;
 }
 
+
+void AvrProgrammer::setVoltagesSTK500(double vtarget_a, double aref0_a, double aref1_a)
+{
+    vTarget = vtarget_a;
+    aref0 = aref0_a;
+    aref1 = aref1_a;
+    isTerminalMode = true;
+    currentDudeTask = DudeTaskSetVoltages;
+    QString startString = staticProgrammerCommand();
+    startString.append(" -t");
+    avrDudeProcess->start(startString);
+    setVoltageStepCnt = 3;
+    emit avrDudeOut(startString);
+}
+
+void AvrProgrammer::getVoltagesSTK500()
+{
+    isTerminalMode = true;
+    currentDudeTask = DudeTaskGetVoltages;
+    QString startString = staticProgrammerCommand();
+    startString.append(" -t");
+    getValueCMDSent = false;
+    avrDudeProcess->start(startString);
+    emit avrDudeOut(startString);
+}

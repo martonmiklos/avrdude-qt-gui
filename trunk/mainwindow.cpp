@@ -741,7 +741,7 @@ void MainWindow::on_pushButtonProgramLockbits_clicked()
 
 void MainWindow::on_horizontalSliderVTarget_sliderMoved(int position)
 {
-    double voltage = position/10;
+    double voltage = (double)position/10;
     ui->doubleSpinBoxVTarget->setValue(voltage);
 }
 
@@ -762,4 +762,27 @@ void MainWindow::deviceChanged()
         ui->tableViewLockBitFields->openPersistentEditor(avrPart->lockByteFieldsModel()->index(i, 1));
 
     on_comboBoxFuseDisplaymode_activated(ui->comboBoxFuseDisplaymode->currentIndex());
+}
+
+void MainWindow::on_pushButtonVerifyFuses_clicked()
+{
+    logMessage(tr("Verifying fuses"));
+    avrProgrammer->verifyFuses();
+}
+
+void MainWindow::on_pushButtonReadVoltages_clicked()
+{
+    logMessage(tr("Reading programming voltages"));
+    avrProgrammer->getVoltagesSTK500();
+}
+
+void MainWindow::on_pushButtonWriteVoltages_clicked()
+{
+    logMessage(tr("Setting Vtarget to: %1, AREF0 to: %2 AREF1 to: %3")
+               .arg(ui->doubleSpinBoxVTarget->value())
+               .arg(ui->doubleSpinBoxAREF0->value())
+               .arg(ui->doubleSpinBoxAREF1->value()));
+    avrProgrammer->setVoltagesSTK500(ui->doubleSpinBoxVTarget->value(),
+                                     ui->doubleSpinBoxAREF0->value(),
+                                     ui->doubleSpinBoxAREF1->value());
 }
