@@ -412,4 +412,7 @@ QStringList AvrPart::getSupportedFuses()
     return ret;
 }
 
-
+void AvrPart::fusesChanged()
+{
+    fusesModel()->emitChanged();
+}

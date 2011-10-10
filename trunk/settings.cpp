@@ -14,8 +14,8 @@ Settings::Settings(QObject *parent) :
     dudePath = settingsIni->value("dudePath", "/usr/bin/avrdude").toString();
     xmlsPath = settingsIni->value("xmlsPath", "/usr/share/avrxmls").toString(); // FIXME check avrstudio default installation path
     #elif defined(Q_OS_WIN32)
-    dudePath = settingsIni->value("dudePath", "C:\winavr\bin\avrdude").toString(); // FIXMEE check winavr default path
-    xmlsPath = settingsIni->value("xmlsPath", ""); // FIXME check avrstudio default installation path
+    dudePath = settingsIni->value("dudePath", "C:\\winavr\\bin\\avrdude").toString();
+    xmlsPath = settingsIni->value("xmlsPath", "").toString(); // FIXME check avrstudio default installation path
     #else
     dudePath = settingsIni->value("dudePath", "").toString(); // FIXMEE
     xmlsPath = settingsIni->value("xmlsPath", "/usr/share/avrxmls").toString(); // FIXME check avrstudio default installation path

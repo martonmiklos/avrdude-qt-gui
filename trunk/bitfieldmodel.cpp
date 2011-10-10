@@ -68,7 +68,7 @@ QVariant RegistersModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool RegistersModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool RegistersModel::setData(const QModelIndex &index, const QVariant &value, int )
 {
     if (m_registers != NULL) {
         if (index.row() < m_registers->size() && index.column() == 1) {
