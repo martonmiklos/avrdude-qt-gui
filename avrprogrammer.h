@@ -35,6 +35,9 @@ typedef enum
     DudeTaskReadLock,
     DudeTaskWriteLock,
     DudeTaskVerifyLock,
+    DudeTaskReadVoltages,
+    DudeTaskSetVoltages,
+    DudeTaskGetVoltages
 
 } CurrentDudeTask;
 
@@ -59,13 +62,16 @@ public:
 
     void programFuses();
     void readFuses(QStringList fuseList);
-    void verifyFuses(QStringList fuseList);
+    void verifyFuses();
 
     void programLockByte();
     void readLockByte();
     void verifyLockByte();
 
     bool isWorking() const {return currentDudeTask == DudeTaskNone;}
+
+    void setVoltagesSTK500(double vtarget, double aref0, double aref1);
+    void getVoltagesSTK500();
 
 signals:
     void signatureReadSignal(quint8 sign0, quint8 sing1, quint8 sign2);
@@ -92,6 +98,11 @@ private:
     QString getAvrDudeFuseNameFromXMLName(QString fuseName);
 
     int getFirstHexNumberFromStr(QString str, bool & success, int & numberEnd);
+
+    bool isTerminalMode;
+    double vTarget, aref0, aref1;
+    int setVoltageStepCnt;
+    bool getValueCMDSent;
 
 private slots:
     void readyReadDudeOutPut();

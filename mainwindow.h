@@ -95,6 +95,9 @@ private slots:
     void progressStep();
     void verifyFailed(QString what, int offset, int value_read, int value_waited);
     void deviceChanged(); // a slot to open all delegate on the fuse and lockbytefield tableviews
+    void on_pushButtonVerifyFuses_clicked();
+    void on_pushButtonReadVoltages_clicked();
+    void on_pushButtonWriteVoltages_clicked();
 };
 
 #endif // MAINWINDOW_H
