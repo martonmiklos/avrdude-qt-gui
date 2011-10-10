@@ -4,7 +4,7 @@
 #include <QStringList>
 #include <QString>
 AvrProgrammer::AvrProgrammer(Settings *sa, AvrPart *part, QObject *parent)
-    : QObject(parent), currentPart(part), settings(sa), isTerminalMode(true)
+    : QObject(parent), currentPart(part), settings(sa), isTerminalMode(false)
 {
     if (friendlyName.isEmpty())
         friendlyName = avrDudeName;
