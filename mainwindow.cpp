@@ -458,6 +458,7 @@ void MainWindow::signatureRead(quint8 s0, quint8 s1, quint8 s2)
                 if (okBox.exec() == QMessageBox::Yes) {
                     ui->labelSignatureMatch->setText("<b>The signature matches the selected device</b>");
                     ui->comboBoxDevice->setCurrentIndex(ui->comboBoxDevice->findText(partIs));
+                    on_comboBoxDevice_activated(ui->comboBoxDevice->currentIndex());
                     avrPart->setPartName(partIs);
                     settings->partName = ui->comboBoxDevice->itemData(ui->comboBoxDevice->currentIndex()).toString();
                     statusBarLabel->setText(QString("<b>%1 %2</b>").arg(avrPart->getPartName()).arg(avrPart->getSignature()));
@@ -513,7 +514,7 @@ void MainWindow::showFlashHexFileBrowse()
         path = info.absolutePath();
     }
 
-    QString fn = QFileDialog::QFileDialog::getSaveFileName(this, tr("Select the hex file location"), path, tr("HEX files (*.hex)"));
+    QString fn = QFileDialog::getSaveFileName(this, tr("Select the hex file location"), path, tr("HEX files (*.hex)"));
     if (fn != "") {
         ui->lineEditFlashHex->setText(fn);
         settings->flashHexFile = fn;

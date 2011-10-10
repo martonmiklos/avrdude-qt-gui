@@ -34,6 +34,8 @@ public:
     RegistersModel* lockByteModel() const {return m_lockBytesModel;}
     RegisterFieldsModel *lockByteFieldsModel() const {return m_lockByteFieldsModel;}
 
+    void fusesChanged();
+
 private:
     // avr related variables
     QString partNameStr; // teh normal name of the controller (for e.g Atmega8)

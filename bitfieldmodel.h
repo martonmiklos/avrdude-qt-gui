@@ -101,6 +101,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
+    void emitChanged() {emit changed();}
 private:
     QList<Register*> *m_registers;
     int m_registerCnt;

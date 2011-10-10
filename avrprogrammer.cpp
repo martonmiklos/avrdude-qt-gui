@@ -154,6 +154,7 @@ void AvrProgrammer::dudeFinished(int retcode)
                         for(int j = 0; j< currentPart->fuseRegs.size(); j++) {
                             if (getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs.at(j)->name()) == fusesToRead[i]) {
                                 currentPart->fuseRegs[j]->setValue(currentFuseValue);
+                                currentPart->fusesChanged();
                                 break;
                             }
                         }
