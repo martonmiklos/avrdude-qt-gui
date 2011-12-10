@@ -514,7 +514,7 @@ void MainWindow::showFlashHexFileBrowse()
         path = info.absolutePath();
     }
 
-    QString fn = QFileDialog::getSaveFileName(this, tr("Select the hex file location"), path, tr("HEX files (*.hex)"));
+    QString fn = QFileDialog::getOpenFileName(this, tr("Select the hex file location"), path, tr("HEX files (*.hex)"));
     if (fn != "") {
         ui->lineEditFlashHex->setText(fn);
         settings->flashHexFile = fn;

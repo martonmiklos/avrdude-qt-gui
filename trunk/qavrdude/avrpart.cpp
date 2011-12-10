@@ -117,11 +117,11 @@ AvrPart::AvrPart(Settings *sa, QString name, QObject *parent)
 
     // set the backend data structures
     m_fusesModel->setRegisters(&fuseRegs);
-    m_fuseFieldsModel->setRegisters(&fuseRegs);
+    m_fuseFieldsModel->setRegisters(&lockBytes);
 
 
     m_fuseFieldsModel->setRegisters(&fuseRegs);
-    m_lockByteFieldsModel->setRegisters(&fuseRegs);
+    m_lockByteFieldsModel->setRegisters(&lockBytes);
 
     setPartName(name); // do it only after the creating of the model objects
 }

@@ -10,6 +10,7 @@ QT += xml
 OBJECTS_DIR = build
 MOC_DIR = build
 UI_DIR = build
+DESTDIR = bin
 
 SOURCES += main.cpp\
     partdeschandler.cpp \
