@@ -514,7 +514,10 @@ void MainWindow::showFlashHexFileBrowse()
         path = info.absolutePath();
     }
 
-    QString fn = QFileDialog::getOpenFileName(this, tr("Select the hex file location"), path, tr("HEX files (*.hex)"));
+    QString fn = QFileDialog::getOpenFileName(this,
+                                              tr("Select the flash image"),
+                                              path,
+                                              tr("HEX files (*.hex);;RAW image (*.bin *.raw);;Motorla S Records (*.s)"));
     if (fn != "") {
         ui->lineEditFlashHex->setText(fn);
         settings->flashHexFile = fn;
