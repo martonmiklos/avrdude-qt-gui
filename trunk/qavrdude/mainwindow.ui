@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>9</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabMain">
        <attribute name="title">
@@ -46,7 +46,7 @@
               <string>Erase device</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="icons/icons.qrc">
                <normaloff>:/edit-delete.svg</normaloff>:/edit-delete.svg</iconset>
              </property>
             </widget>
@@ -90,7 +90,7 @@
               <string>Settings</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="icons/icons.qrc">
                <normaloff>:/gconf-editor.svg</normaloff>:/gconf-editor.svg</iconset>
              </property>
             </widget>
@@ -122,7 +122,7 @@
       </widget>
       <widget class="QWidget" name="tabProgram">
        <attribute name="icon">
-        <iconset>
+        <iconset resource="icons/icons.qrc">
          <normaloff>:/avr.svg</normaloff>:/avr.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -143,7 +143,7 @@
                 <string>Erase</string>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="icons/icons.qrc">
                  <normaloff>:/edit-delete.svg</normaloff>:/edit-delete.svg</iconset>
                </property>
               </widget>
@@ -214,7 +214,7 @@
                 <string>Program</string>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="icons/icons.qrc">
                  <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
                </property>
               </widget>
@@ -232,7 +232,7 @@
                 <string>Read</string>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="icons/icons.qrc">
                  <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
                </property>
               </widget>
@@ -276,7 +276,7 @@
                 <string>Program</string>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="icons/icons.qrc">
                  <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
                </property>
               </widget>
@@ -294,7 +294,7 @@
                 <string>Read</string>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="icons/icons.qrc">
                  <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
                </property>
               </widget>
@@ -308,7 +308,7 @@
       </widget>
       <widget class="QWidget" name="tabFuses">
        <attribute name="icon">
-        <iconset>
+        <iconset resource="icons/icons.qrc">
          <normaloff>:/fuse-64.png</normaloff>:/fuse-64.png</iconset>
        </attribute>
        <attribute name="title">
@@ -388,7 +388,7 @@
              <string>Program</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="icons/icons.qrc">
               <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
             </property>
            </widget>
@@ -406,7 +406,7 @@
              <string>Read</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="icons/icons.qrc">
               <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
             </property>
            </widget>
@@ -417,7 +417,7 @@
       </widget>
       <widget class="QWidget" name="tabLockBits">
        <attribute name="icon">
-        <iconset>
+        <iconset resource="icons/icons.qrc">
          <normaloff>:/locked.svg</normaloff>:/locked.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -448,7 +448,7 @@
              <string>Program</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="icons/icons.qrc">
               <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
             </property>
            </widget>
@@ -466,7 +466,7 @@
              <string>Read</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="icons/icons.qrc">
               <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
             </property>
            </widget>
@@ -477,7 +477,7 @@
       </widget>
       <widget class="QWidget" name="tabAdvanced">
        <attribute name="icon">
-        <iconset>
+        <iconset resource="icons/icons.qrc">
          <normaloff>:/preferences-system.svg</normaloff>:/preferences-system.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -581,7 +581,7 @@
       </widget>
       <widget class="QWidget" name="tabHWSettings">
        <attribute name="icon">
-        <iconset>
+        <iconset resource="icons/icons.qrc">
          <normaloff>:/gconf-editor.svg</normaloff>:/gconf-editor.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -753,7 +753,7 @@
       </widget>
       <widget class="QWidget" name="tabAVRDudeOutput">
        <attribute name="icon">
-        <iconset>
+        <iconset resource="icons/icons.qrc">
          <normaloff>:/utilities-terminal.svg</normaloff>:/utilities-terminal.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -783,7 +783,7 @@
            <string>Clear</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="icons/icons.qrc">
             <normaloff>:/edit-clear.svg</normaloff>:/edit-clear.svg</iconset>
           </property>
           <property name="iconSize">
@@ -907,7 +907,7 @@
       </widget>
       <widget class="QWidget" name="tabSelectProgrammer">
        <attribute name="icon">
-        <iconset>
+        <iconset resource="icons/icons.qrc">
          <normaloff>:/Usb-svg.svg</normaloff>:/Usb-svg.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -1223,7 +1223,7 @@
       </widget>
       <widget class="QWidget" name="tabAbout">
        <attribute name="icon">
-        <iconset>
+        <iconset resource="icons/icons.qrc">
          <normaloff>:/help-about.svg</normaloff>:/help-about.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -1240,6 +1240,7 @@ p, li { white-space: pre-wrap; }
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
@@ -1265,7 +1266,7 @@ p, li { white-space: pre-wrap; }
            <string>About Qt</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="icons/icons.qrc">
             <normaloff>:/Qt-logo.svg_.png</normaloff>:/Qt-logo.svg_.png</iconset>
           </property>
          </widget>
@@ -1295,6 +1296,8 @@ p, li { white-space: pre-wrap; }
    <header>hexlineedit.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

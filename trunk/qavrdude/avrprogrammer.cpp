@@ -302,11 +302,18 @@ void AvrProgrammer::eraseDevice()
     emit avrDudeOut(startString);
 }
 
-void AvrProgrammer::programFlash(QString hexFileName, bool verifyAfter, bool eraseBefore)
+void AvrProgrammer::programFlash(QString fileName, bool verifyAfter, bool eraseBefore)
 {
     currentDudeTask = DudeTaskWriteFlash;
     QString startString = staticProgrammerCommand();
-    startString.append(" -U flash:w:"+hexFileName+":i");
+    QChar flashType = 'i';
+    if (fileName.toLower().endsWith(".s")) {
+        flashType = 's';
+    } else if (fileName.toLower().endsWith(".bin") || fileName.toLower().endsWith(".raw")) {
+        flashType = 'r';
+    }
+
+    startString.append(" -U flash:w:"+fileName+":"+flashType);
     if (!verifyAfter)
         startString.append(" -V");
     if (!eraseBefore)
