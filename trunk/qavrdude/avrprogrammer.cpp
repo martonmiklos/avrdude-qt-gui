@@ -35,18 +35,18 @@ void AvrProgrammer::readyReadDudeOutPut()
     qWarning() << outPut << "\n";
     emit avrDudeOut(outPut);
     if ((currentDudeTask == DudeTaskReadFlash)      ||
-        (currentDudeTask == DudeTaskWriteFlash)     ||
-        (currentDudeTask == DudeTaskVerifyFlash)    ||
-        (currentDudeTask == DudeTaskReadEEPROM)     ||
-        (currentDudeTask == DudeTaskWriteEEPROM)    ||
-        (currentDudeTask == DudeTaskVerifyEEPROM)) {
+            (currentDudeTask == DudeTaskWriteFlash)     ||
+            (currentDudeTask == DudeTaskVerifyFlash)    ||
+            (currentDudeTask == DudeTaskReadEEPROM)     ||
+            (currentDudeTask == DudeTaskWriteEEPROM)    ||
+            (currentDudeTask == DudeTaskVerifyEEPROM)) {
         if ((outPut.size() == 1) && (outPut[0] == '#')) {
             emit progressStep();
         }
     }
 
     if ((currentDudeTask == DudeTaskVerifyFlash) ||
-        (currentDudeTask == DudeTaskVerifyEEPROM)) {
+            (currentDudeTask == DudeTaskVerifyEEPROM)) {
         if (outPut.contains("first mismatch at byte")) {
             int offset, readVal, fileVal;
             bool success = false;
@@ -122,37 +122,37 @@ void AvrProgrammer::dudeFinished(int retcode)
 {
     switch(currentDudeTask) {
     case DudeTaskReadSignature: {
-            signatureFile->open(QIODevice::ReadOnly);
-            QString signature = signatureFile->readAll();
-            if (signature.isEmpty()) {
-                emit taskFailed(QString(tr("The %1/signature.txt file is empty")).arg(QDir::tempPath()));
-                emit taskFailed(tr("Reading the signature failed"));
-            } else {
-                QStringList signatures;
-                signatures = signature.split(',');
-                quint8 sign0, sign1, sign2;
-                if (signatures.size() < 3) {
-                    emit taskFailed(tr("Unable to read all signature bytes"));
-                }
-                bool ok = false;
-                sign0 = signatures[0].toInt(&ok,16);
-                sign1 = signatures[1].toInt(&ok,16);
-                sign2 = signatures[2].toInt(&ok,16);
-                if (!ok) {
-                    emit taskFailed(QString("Unable to convert the signature bytes.\n Check the contents of the %1/signature.txt file").arg(QDir::tempPath()));
-                } else {
-                    emit signatureReadSignal(sign0, sign1, sign2);
-                }
+        signatureFile->open(QIODevice::ReadOnly);
+        QString signature = signatureFile->readAll();
+        if (signature.isEmpty()) {
+            emit taskFailed(QString(tr("The %1/signature.txt file is empty")).arg(QDir::tempPath()));
+            emit taskFailed(tr("Reading the signature failed"));
+        } else {
+            QStringList signatures;
+            signatures = signature.split(',');
+            quint8 sign0, sign1, sign2;
+            if (signatures.size() < 3) {
+                emit taskFailed(tr("Unable to read all signature bytes"));
             }
-            signatureFile->close();
-        } break;
-    case DudeTaskErase: {
-            if (retcode) {
-                emit taskFailed(QString("Erasing failed\nThe avrdude process ended with %1 code").arg(retcode));
+            bool ok = false;
+            sign0 = signatures[0].toInt(&ok,16);
+            sign1 = signatures[1].toInt(&ok,16);
+            sign2 = signatures[2].toInt(&ok,16);
+            if (!ok) {
+                emit taskFailed(QString("Unable to convert the signature bytes.\n Check the contents of the %1/signature.txt file").arg(QDir::tempPath()));
             } else {
-                emit taskFinishedOk("Erasing done");
+                emit signatureReadSignal(sign0, sign1, sign2);
             }
         }
+        signatureFile->close();
+    } break;
+    case DudeTaskErase: {
+        if (retcode) {
+            emit taskFailed(QString("Erasing failed\nThe avrdude process ended with %1 code").arg(retcode));
+        } else {
+            emit taskFinishedOk("Erasing done");
+        }
+    }
         break;
     case DudeTaskReadFlash:
         if (!retcode) {
@@ -179,113 +179,123 @@ void AvrProgrammer::dudeFinished(int retcode)
         }
         break;
     case DudeTaskReadFuse: {
-            QString fuseValues;
-            if (!retcode) {
-                bool ok = true;
-                for (int i = 0; i<fusesToRead.size(); i++)  { // loop trough the Avrpart'
-                    bool ok = false;
-                    QFile currentFuseOutFile(QDir::tempPath()+"/"+fusesToRead[i]+".txt");
-                    currentFuseOutFile.open(QFile::ReadOnly);
-                    quint8 currentFuseValue = currentFuseOutFile.readAll().trimmed().toInt(&ok, 16);
-                    currentFuseOutFile.close();
-                    if (ok == false) {
-                        emit taskFailed(QString(tr("Unable to read the %1 fuse")).arg(fuseNamesToRead[i]));
-                    } else {
-                        // fancy output to the status listbox
-                        fuseValues.append(fusesToRead[i].toUpper()+
-                                          ": 0x"+QString::number(currentFuseValue, 16).rightJustified(2, '0').toUpper());
-                        if (i != (fusesToRead.size() -1))
-                            fuseValues.append(", ");
+        QString fuseValues;
+        if (!retcode) {
+            bool ok = true;
+            for (int i = 0; i<fusesToRead.size(); i++)  { // loop trough the Avrpart'
+                bool ok = false;
+                QFile currentFuseOutFile(QDir::tempPath()+"/"+fusesToRead[i]+".txt");
+                currentFuseOutFile.open(QFile::ReadOnly);
+                quint8 currentFuseValue = currentFuseOutFile.readAll().trimmed().toInt(&ok, 16);
+                currentFuseOutFile.close();
+                if (ok == false) {
+                    emit taskFailed(QString(tr("Unable to read the %1 fuse")).arg(fuseNamesToRead[i]));
+                } else {
+                    // fancy output to the status listbox
+                    fuseValues.append(fusesToRead[i].toUpper()+
+                                      ": 0x"+QString::number(currentFuseValue, 16).rightJustified(2, '0').toUpper());
+                    if (i != (fusesToRead.size() -1))
+                        fuseValues.append(", ");
 
-                        for(int j = 0; j< currentPart->fuseRegs.size(); j++) {
-                            if (getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs.at(j)->name()) == fusesToRead[i]) {
-                                currentPart->fuseRegs[j]->setValue(currentFuseValue);
-                                currentPart->fusesChanged();
-                                break;
-                            }
+                    for(int j = 0; j< currentPart->fuseRegs.size(); j++) {
+                        if (getAvrDudeFuseNameFromXMLName(currentPart->fuseRegs.at(j)->name()) == fusesToRead[i]) {
+                            currentPart->fuseRegs[j]->setValue(currentFuseValue);
+                            currentPart->fusesChanged();
+                            break;
                         }
                     }
                 }
-
-                if (ok) {
-                    emit taskFinishedOk(QString(tr("Reading the fuse bits done (%1)")).arg(fuseValues));
-                    emit fusesReaded();
-                }
-            } else {
-                emit taskFailed(tr("Failed to read the fuse bits"));
             }
-        } break;
+
+            if (ok) {
+                emit taskFinishedOk(QString(tr("Reading the fuse bits done (%1)")).arg(fuseValues));
+                emit fusesReaded();
+            }
+        } else {
+            emit taskFailed(tr("Failed to read the fuse bits"));
+        }
+    } break;
     case DudeTaskWriteFuse: {
-            if (!retcode) {
-                emit taskFinishedOk(tr("Writing the fuse bits was successful"));
-            } else {
-                emit taskFailed(tr("Failed to write the fuse bits"));
-            }
-        } break;
+        if (!retcode) {
+            emit taskFinishedOk(tr("Writing the fuse bits was successful"));
+        } else {
+            emit taskFailed(tr("Failed to write the fuse bits"));
+        }
+    } break;
     case DudeTaskVerifyFuse: {
-            if (!retcode) {
-                emit taskFinishedOk("The setted fuse values matched the fuses in the device");
-            } else {
-                emit taskFailed(QString(tr("Fuse bits mismatch in the device.\n"
-                                           "Check the <a href=\"tab_dudeout\">AVRDude output tab </a> for details")));
-            }
-        } break;
+        if (!retcode) {
+            emit taskFinishedOk("The setted fuse values matched the fuses in the device");
+        } else {
+            emit taskFailed(QString(tr("Fuse bits mismatch in the device.\n"
+                                       "Check the <a href=\"tab_dudeout\">AVRDude output tab </a> for details")));
+        }
+    } break;
     case DudeTaskReadEEPROM: {
-
-        } break;
+        if (!retcode) {
+            emit taskFinishedOk("Reading the EEPROM memory was successful.");
+        } else {
+            emit taskFailed(QString(tr("EEPROM reading failed: avrdude retcode: %1.\n"
+                                       "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
+        }
+    } break;
     case DudeTaskVerifyEEPROM: {
-            if (!retcode) {
-                emit taskFinishedOk(tr("Verification of the EEPROM memory was successful."));
-            } else {
-                emit taskFailed(QString(tr("EEPROM verification failed: avrdude retcode: %1.\n"
-                                           "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
-            }
-        } break;
+        if (!retcode) {
+            emit taskFinishedOk(tr("Verification of the EEPROM memory was successful."));
+        } else {
+            emit taskFailed(QString(tr("EEPROM verification failed: avrdude retcode: %1.\n"
+                                       "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
+        }
+    } break;
     case DudeTaskWriteEEPROM: {
-
-        } break;
+        if (!retcode) {
+            emit taskFinishedOk("Programming the EEPROM memory was successful.");
+        } else {
+            emit taskFailed(QString(tr("EEPROM writing failed: avrdude retcode: %1.<br>"
+                                       "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
+        }
+    } break;
     case DudeTaskReadLock: {
-            if (!retcode) {
-                QFile currentLockByteFile(QDir::tempPath()+"/lockbyte_value.txt");
-                if (currentLockByteFile.open(QFile::ReadOnly)) {
-                    bool ok = false;
-                    quint8 lockbyte = currentLockByteFile.readAll().trimmed().toInt(&ok, 16);
-                    currentLockByteFile.close();
-                    if (ok == false) {
-                        emit taskFailed(tr("The lockbyte value is not hexadecimal in the %1 file")
-                                        .arg(currentLockByteFile.fileName()));
-                    } else {
-                        currentPart->lockBytes.first()->setValue(lockbyte); // FIXME if we found AVR part with multiple lockbytes
-                        emit taskFinishedOk(tr("Reading the lockbyte was successful (0x%1)")
-                                            .arg(QString::number(lockbyte, 16).rightJustified(2, '0')));
-                        emit lockBitReaded();
-                    }
+        if (!retcode) {
+            QFile currentLockByteFile(QDir::tempPath()+"/lockbyte_value.txt");
+            if (currentLockByteFile.open(QFile::ReadOnly)) {
+                bool ok = false;
+                quint8 lockbyte = currentLockByteFile.readAll().trimmed().toInt(&ok, 16);
+                currentLockByteFile.close();
+                if (ok == false) {
+                    emit taskFailed(tr("The lockbyte value is not hexadecimal in the %1 file")
+                                    .arg(currentLockByteFile.fileName()));
                 } else {
-                    emit taskFailed(tr("Unable to open the %1 file").arg(currentLockByteFile.fileName()));
+                    currentPart->lockBytes.first()->setValue(lockbyte); // FIXME if we found AVR part with multiple lockbytes
+                    emit taskFinishedOk(tr("Reading the lockbyte was successful (0x%1)")
+                                        .arg(QString::number(lockbyte, 16).rightJustified(2, '0')));
+                    emit lockBitReaded();
                 }
             } else {
-                emit taskFailed(tr("Failed to read the lock byte"));
+                emit taskFailed(tr("Unable to open the %1 file").arg(currentLockByteFile.fileName()));
             }
-        } break;
+        } else {
+            emit taskFailed(tr("Failed to read the lock byte"));
+        }
+    } break;
     case DudeTaskSetVoltages: {
-            if (!retcode) {
-                emit taskFinishedOk(tr("Programming voltages had been set successfully."));
-            } else {
-                emit taskFailed(QString(tr("Unable to set programmer voltages: avrdude returned with error-code: %1.\n"
-                                           "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
-            }
-        } break;
+        if (!retcode) {
+            emit taskFinishedOk(tr("Programming voltages had been set successfully."));
+        } else {
+            emit taskFailed(QString(tr("Unable to set programmer voltages: avrdude returned with error-code: %1.\n"
+                                       "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
+        }
+    } break;
     case DudeTaskGetVoltages: {
-            if (!retcode) {
-                emit taskFinishedOk(tr("Programming voltages had been readed successfully."));
-            } else {
-                emit taskFailed(QString(tr("Unable to read programmer voltages: avrdude returned with error-code: %1.\n"
-                                           "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
-            }
-        } break;
+        if (!retcode) {
+            emit taskFinishedOk(tr("Programming voltages had been readed successfully."));
+        } else {
+            emit taskFailed(QString(tr("Unable to read programmer voltages: avrdude returned with error-code: %1.\n"
+                                       "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
+        }
+    } break;
     case DudeTaskNone: {
 
-        } break;
+    } break;
     default:
         qWarning() << "TODO IMPLEMENT IT";
         break;
@@ -438,15 +448,15 @@ QString AvrProgrammer::staticProgrammerCommand()
     QString ret;
     if (!settings->particularProgOptions) {
         ret = QString("%1 -p %2 -c %3 -P %4")
-              .arg(settings->dudePath)
-              .arg(settings->partName)
-              .arg(settings->programmerName)
-              .arg(settings->programmerPort);
+                .arg(settings->dudePath)
+                .arg(settings->partName)
+                .arg(settings->programmerName)
+                .arg(settings->programmerPort);
     } else {
         ret = QString("%1 -p %3 %2")
-              .arg(settings->dudePath)
-              .arg(settings->programmerOptions)
-              .arg(settings->partName);
+                .arg(settings->dudePath)
+                .arg(settings->programmerOptions)
+                .arg(settings->partName);
     }
     return ret;
 }
