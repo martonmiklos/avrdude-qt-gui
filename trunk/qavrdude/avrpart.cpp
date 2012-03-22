@@ -255,7 +255,7 @@ bool AvrPart::fillFuseAndLockData()
             // this will iterate on the High low, extended fuses or on fuse[N] keys at xmega devices
             for(int i = 0; i<registersFuseNode.childNodes().count(); i++) {
                 QDomElement fuseRegElement = registersFuseNode.childNodes().item(i).toElement();
-                if (fuseRegElement.attribute("name").toAscii() == "")
+                if (fuseRegElement.attribute("name") == "")
                     break; // ignore the offset only fuseregs
 
                 Register *currentFuseRegister = new Register(
@@ -304,7 +304,7 @@ bool AvrPart::fillFuseAndLockData()
         } else {
             for(int i = 0; i<lockBitsNode.childNodes().count(); i++) {
                 QDomElement lockBitElement = lockBitsNode.childNodes().item(i).toElement();
-                if (lockBitElement.attribute("name").toAscii() == "")
+                if (lockBitElement.attribute("name") == "")
                     break; // ignore the offset only lockbits
                 Register *currentLockByte = new Register(lockBitElement.attribute("name", tr("Name field empty")),
                                         lockBitElement.attribute("offset").toInt(),

@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QFile>
 #include <QUrl>
+#include <QSplitter>
 
 #include "avrprogrammer.h"
 #include "settings.h"
@@ -44,7 +45,6 @@ private:
 
     BitFieldDelegate *lockFieldDelegate, *fuseFieldDelegate;
     RegisterValueDelegate *fuseValueDelegate;
-
 
     void fillDeviceList();
     void fillProgrammersList();
