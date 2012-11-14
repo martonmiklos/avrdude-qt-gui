@@ -1,7 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -22,6 +25,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButtonGo_clicked()
 {
     converter.convert(ui->lineEditSQLITE->text(), ui->lineEditXMLDir->text());
+    qWarning()  << "done";
 }
 
 void MainWindow::on_pushButtonBrowseSQLITE_clicked()

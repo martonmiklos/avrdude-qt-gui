@@ -1,1 +1,1 @@
- The XML_converter is a small application for converting the atmel provided part description XML files to an SQLITE database
+ The XML_converter is an application for converting the Atmel provided part description XML files to an SQLITE database
