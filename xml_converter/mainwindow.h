@@ -27,6 +27,8 @@ private slots:
 
     void logMessage(QString str);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QSettings settings;

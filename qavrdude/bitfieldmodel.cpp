@@ -121,7 +121,7 @@ void RegistersModel::refresh()
 
     beginInsertRows(index(0,0), 0, m_registerCnt);
     endInsertRows();
-    reset();
+    //reset();
 }
 
 /* RegisterFieldsModel members: */
@@ -160,8 +160,12 @@ QVariant RegisterFieldsModel::data(const QModelIndex &index, int role) const
                 switch (index.column()) {
                 case 0: { // fuse name
                         switch(role) {
-                        case Qt::DisplayRole: return m_registers->at(i)->bitFields[j].shortName(); break;
-                        case Qt::ToolTipRole: return m_registers->at(i)->bitFields[j].name(); break;
+                        case Qt::ToolTipRole:
+                            return m_registers->at(i)->bitFields[j].name();
+                            break;
+                        case Qt::DisplayRole:
+                            return m_registers->at(i)->bitFields[j].name() + " (" + m_registers->at(i)->bitFields[j].shortName() + ")";
+                            break;
                         }; // switch role
                     } break; // column 0
                 case 1: { // fuse value
@@ -231,5 +235,5 @@ void RegisterFieldsModel::refresh()
 
     beginInsertRows(index(0,0), 0, m_registerCnt);
     endInsertRows();
-    reset();
+    //reset();
 }

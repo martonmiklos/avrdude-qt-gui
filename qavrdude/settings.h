@@ -7,10 +7,15 @@ class Settings : public QObject
 {
 Q_OBJECT
 public:
+    enum DeviceDataType {
+        DeviceDb_XML = 0,
+        DeviceDb_SQLite
+    };
+
     explicit Settings(QObject *parent = 0);
     ~Settings();
     QString dudePath;
-    QString xmlsPath;
+    QString xmlsPath, sqlitePath;
     bool showAvrDudeOutPut;
     bool particularProgOptions;
     QString programmerOptions;
@@ -23,6 +28,7 @@ public:
     int defaultTabIndex;
     int lastTabIndex;
     bool noicons;
+    DeviceDataType deviceData;
 private:
     QSettings *settingsIni;
 signals:

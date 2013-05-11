@@ -87,7 +87,7 @@ void AvrProgrammer::readyReadDudeOutPut()
                         cmd = "quit\n";
                         break;
                     }
-                    avrDudeProcess->write(cmd.toAscii());
+                    avrDudeProcess->write(cmd.toLocal8Bit());
                     setVoltageStepCnt--;
                 }
             }

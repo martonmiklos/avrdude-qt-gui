@@ -9,16 +9,16 @@ XMLConverter::XMLConverter(QObject *parent) :
     QObject(parent)
 {
     database = QSqlDatabase::addDatabase("QSQLITE");
+    if (!database.isValid()) {
+        QMessageBox::warning(0, tr("Arrgh"), tr("The SQLITE database plugin for Qt cannot be loaded.\nAre you sure that it is installed?"));
+    }
 }
 
-bool XMLConverter::convert(QString sqlite, QString xmlsDir)
+bool XMLConverter::truncate(QString sqlite)
 {
-    QDir dir(xmlsDir);
-    QStringList fileList = dir.entryList(QStringList("*.xml"));
-
     database.setDatabaseName(sqlite);
     if (!database.open()) {
-        logMessage(tr("Unable to open database"));
+        logMessage(tr("Unable to open database: %1").arg(database.lastError().driverText()));
         return false;
     }
 
@@ -34,11 +34,30 @@ bool XMLConverter::convert(QString sqlite, QString xmlsDir)
         }
     }
 
+    return true;
+}
+
+bool XMLConverter::convert(QString sqlite, QString xmlsDir)
+{
+    QDir dir(xmlsDir);
+    QStringList fileList = dir.entryList(QStringList("*.xml"));
+
+    if (!truncate(sqlite)) {
+        return false;
+    }
+
     /*if (!parseFile(dir.path()+"/ATmega128.xml")) {
         emit logMessage(tr("Parsing failed"));
         return false;
     }
     return true;*/
+
+    if (fileList.isEmpty()) {
+        emit logMessage("The XMLs folder does not contains any XML file!");
+        return false;
+    }
+    QSqlQuery query;
+    query.exec("BEGIN");
 
     foreach (QString devxml, fileList) {
         if (!parseFile(dir.path()+"/"+devxml)) {
@@ -46,21 +65,23 @@ bool XMLConverter::convert(QString sqlite, QString xmlsDir)
             return false;
         }
     }
-
+    query.exec("COMMIT");
     return true;
 }
 
 
-void XMLConverter::sqlError(QSqlQuery *query)
+bool XMLConverter::sqlError(QSqlQuery *query)
 {
-    QMessageBox::critical(NULL,
+    return QMessageBox::critical(NULL,
                           tr("SQL error"),
                           tr("An error happend during executing the following query:\n"
                              "%1\n"
                              "Error string:\n"
                              "%2")
                           .arg(query->lastQuery())
-                          .arg(query->lastError().text()));
+                          .arg(query->lastError().text()),
+                          QMessageBox::Abort,
+                          QMessageBox::Discard) == QMessageBox::Discard;
 }
 
 bool XMLConverter::parseFile(QString file)
@@ -70,6 +91,8 @@ bool XMLConverter::parseFile(QString file)
     domFile.setFileName(file);
     qWarning() << domFile.fileName();
     QFileInfo info(domFile);
+
+    //query.prepare(); // FIXME add sync disable
 
     query.prepare("INSERT INTO devices (name) VALUES(:device)");
     query.bindValue(":device", info.baseName());
@@ -138,7 +161,8 @@ void XMLConverter::parseRegisterDetailsFromNode(QDomNode registersNode, int devi
         query.prepare("SELECT ROWID FROM device_register_types WHERE name = :registername");
         query.bindValue(":registername", regElement.attribute("name"));
         if (!query.exec()) {
-            sqlError(&query);
+            if (sqlError(&query) == false)
+                return;
         }
 
         // if found store the ID in the registerTypeId
@@ -148,14 +172,19 @@ void XMLConverter::parseRegisterDetailsFromNode(QDomNode registersNode, int devi
             // if not found insert a new type
             query.prepare("INSERT INTO device_register_types (name) VALUES(:name)");
             query.bindValue(":name", regElement.attribute("name"));
-            if (!query.exec())
-                sqlError(&query);
+            if (!query.exec()) {
+                if (sqlError(&query)) {
+                    return;
+                }
+            }
 
             if (query.exec("SELECT last_insert_rowid()")) {
                 query.next();
                 registerTypeId = query.value(0).toInt();
             } else {
-                sqlError(&query);
+                if (sqlError(&query)) {
+                    return;
+                }
             }
         }
 
@@ -165,13 +194,17 @@ void XMLConverter::parseRegisterDetailsFromNode(QDomNode registersNode, int devi
         query.bindValue(":type_id", registerTypeId);
 
         if (!query.exec()) {
-            sqlError(&query);
+            if (sqlError(&query)) {
+                return;
+            }
         }
 
 
-        if (!query.exec("SELECT last_insert_rowid()"))
-            sqlError(&query);
-        else {
+        if (!query.exec("SELECT last_insert_rowid()")) {
+            if (sqlError(&query)) {
+                return;
+            }
+        } else {
             if (query.next())
                 registerId = query.value(0).toInt();
         }
@@ -193,7 +226,9 @@ void XMLConverter::parseRegisterDetailsFromNode(QDomNode registersNode, int devi
             query.bindValue(":register_id", registerId);
 
             if (!query.exec()) {
-                sqlError(&query);
+                if (sqlError(&query)) {
+                    return;
+                }
             } else {
                 QSqlQuery lastIdQuery;
                 if (lastIdQuery.exec("SELECT last_insert_rowid()")) {
