@@ -26,6 +26,9 @@ public:
     QString getAvrDudePartNo(QString name) const;
     quint8 sign0, sign1, sign2; // signature bytes
     QString findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2);
+    QString findDeviceWithSignatureXML(quint8 s0, quint8 s1, quint8 s2);
+    QString findDeviceWithSignatureSqlite(quint8 s0, quint8 s1, quint8 s2);
+
     QStringList getSupportedFuses();
 
     // FIXME make PPP

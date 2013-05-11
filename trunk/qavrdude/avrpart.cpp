@@ -450,6 +450,34 @@ bool AvrPart::findXml(QString )
 
 QString AvrPart::findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2)
 {
+    switch (settings->deviceData) {
+    case Settings::DeviceDb_SQLite:
+        return findDeviceWithSignatureSqlite(s0, s1, s2);
+        break;
+    case Settings::DeviceDb_XML:
+        return findDeviceWithSignatureXML(s0, s1, s2);
+        break;
+    }
+    return "";
+}
+
+QString AvrPart::findDeviceWithSignatureSqlite(quint8 s0, quint8 s1, quint8 s2)
+{
+    QSqlQuery partQuery(db);
+    partQuery.prepare("SELECT name FROM devicse where S0 = :s0 AND S1 = :s1 AND S2 = :s2");
+    partQuery.bindValue("S0", s0);
+    partQuery.bindValue("S1", s1);
+    partQuery.bindValue("S2", s2);
+
+    if (partQuery.exec()) {
+        partQuery.next();
+        return partQuery.value(0).toString();
+    }
+    return QString("");
+}
+
+QString AvrPart::findDeviceWithSignatureXML(quint8 s0, quint8 s1, quint8 s2)
+{
     QStringList nameFilter;
     nameFilter.append("*.xml");
     QStringList xmls = QDir(settings->xmlsPath).entryList(nameFilter, QDir::Files);

@@ -89,13 +89,35 @@ bool XMLConverter::parseFile(QString file)
     startTime = QTime::currentTime();
     QSqlQuery query(database);
     domFile.setFileName(file);
-    qWarning() << domFile.fileName();
     QFileInfo info(domFile);
 
-    //query.prepare(); // FIXME add sync disable
+    quint8 sign0, sign1, sign2; // signature bytes
 
-    query.prepare("INSERT INTO devices (name) VALUES(:device)");
+    QDomNode signatureNode = domDoc.elementsByTagName("SIGNATURE").item(0);
+    if (!signatureNode.isNull()) {
+        QDomNode byte = signatureNode.firstChild();
+        QDomElement currentElement;
+        while(!byte.isNull()) {
+            bool ok = false;
+            currentElement = byte.toElement();
+            if (currentElement.tagName() == "ADDR000") {
+                sign0 = currentElement.text().right(2).toInt(&ok, 16);
+            } else if (currentElement.tagName() == "ADDR001") {
+                sign1 = currentElement.text().right(2).toInt(&ok, 16);
+            } else if (currentElement.tagName() == "ADDR002") {
+                sign2 = currentElement.text().right(2).toInt(&ok, 16);
+            }
+            byte = byte.nextSibling();
+        }
+    }
+
+
+    query.prepare("INSERT INTO devices (name, S0, S1, S2) VALUES(:device, :s0, :s1, :s2)");
     query.bindValue(":device", info.baseName());
+    query.bindValue(":s0", sign0);
+    query.bindValue(":s1", sign1);
+    query.bindValue(":s2", sign2);
+
     if (!query.exec()) {
         sqlError(&query);
         return false;
@@ -140,7 +162,9 @@ bool XMLConverter::parseFile(QString file)
             }
         }
     }
-    emit logMessage(tr("Parsing taken %1 ms").arg(startTime.msecsTo(QTime::currentTime())));
+    emit logMessage(tr("Parsing %1 taken %2 ms")
+                    .arg(info.baseName())
+                    .arg(startTime.msecsTo(QTime::currentTime())));
     return true;
 }
 
@@ -157,7 +181,6 @@ void XMLConverter::parseRegisterDetailsFromNode(QDomNode registersNode, int devi
 
         // first check that is not there te same type register in the database
         int registerTypeId = 0, registerId = 0;
-        qWarning() << regElement.attribute("name");
         query.prepare("SELECT ROWID FROM device_register_types WHERE name = :registername");
         query.bindValue(":registername", regElement.attribute("name"));
         if (!query.exec()) {
