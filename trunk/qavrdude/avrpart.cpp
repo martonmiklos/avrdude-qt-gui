@@ -146,6 +146,35 @@ QString AvrPart::getSignature() const
 
 bool AvrPart::setPartName(QString name)
 {
+    switch (settings->deviceData) {
+    case Settings::DeviceDb_SQLite:
+        return setPartNameFromSqlite(name);
+        break;
+    case Settings::DeviceDb_XML:
+        return setPartNameFromXML(name);
+        break;
+    }
+    return false;
+}
+
+bool AvrPart::setPartNameFromSqlite(QString name)
+{
+    QSqlQuery signatureQuery(db);
+    signatureQuery.prepare("SELECT S0, S1, S2 FROM device WHERE name = :name");
+    signatureQuery.bindValue(":name", name);
+    if (signatureQuery.exec()) {
+        if (signatureQuery.next()) {
+            sign0 = signatureQuery.value(0).toInt();
+            sign1 = signatureQuery.value(1).toInt();
+            sign2 = signatureQuery.value(2).toInt();
+            return true;
+        }
+    }
+    return false;
+}
+
+bool AvrPart::setPartNameFromXML(QString name)
+{
     try {
         domFile.setFileName(settings->xmlsPath+"/"+name+".xml");
         if (!domFile.open(QFile::ReadOnly))  {

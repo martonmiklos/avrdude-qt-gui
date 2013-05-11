@@ -21,13 +21,15 @@ public:
     AvrPart(Settings *sa, QString name, QObject *parent = 0);
     QString getPartName() const {return m_partNameStr;}
     bool setPartName(QString pn);
+
+
     QString getSignature() const;
     QString error() const {return errorString;}
     QString getAvrDudePartNo(QString name) const;
     quint8 sign0, sign1, sign2; // signature bytes
+
     QString findDeviceWithSignature(quint8 s0, quint8 s1, quint8 s2);
-    QString findDeviceWithSignatureXML(quint8 s0, quint8 s1, quint8 s2);
-    QString findDeviceWithSignatureSqlite(quint8 s0, quint8 s1, quint8 s2);
+
 
     QStringList getSupportedFuses();
 
@@ -44,6 +46,13 @@ public:
     void fusesChanged();
 
 private:
+
+    bool setPartNameFromXML(QString pn);
+    bool setPartNameFromSqlite(QString pn);
+
+    QString findDeviceWithSignatureXML(quint8 s0, quint8 s1, quint8 s2);
+    QString findDeviceWithSignatureSqlite(quint8 s0, quint8 s1, quint8 s2);
+
     // avr related variables
     QString m_partNameStr; // teh normal name of the controller (for e.g Atmega8)
     QString m_avrdudePartNo; // the partname in avrdude option stlyle representation (for e.g. m8 for Atmega8)
