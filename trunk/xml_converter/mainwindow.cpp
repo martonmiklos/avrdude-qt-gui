@@ -62,3 +62,8 @@ void MainWindow::logMessage(QString str)
 {
     ui->textEdit->append(str);
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    converter.truncate(ui->lineEditSQLITE->text());
+}

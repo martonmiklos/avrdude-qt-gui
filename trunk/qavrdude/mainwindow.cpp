@@ -11,14 +11,34 @@ MainWindow::MainWindow(QWidget *parent) :
     statusBarLabel = new QLabel(this);
     statusBarLabel->setText("asd");
     ui->setupUi(this);
+
+    // TODO implement it
+    ui->tabWidgetMain->removeTab(5);
+    ui->tabWidgetMain->removeTab(8);
+
     ui->statusbar->addWidget(statusBarLabel);
 
     // settings to gui
+    dataSourceButtonGroup = new QButtonGroup(this);
+    dataSourceButtonGroup->addButton(ui->radioButtonUseSqlite);
+    dataSourceButtonGroup->addButton(ui->radioButtonUseXML);
+
     settings = new Settings(this);
+
+    switch (settings->deviceData) {
+    case Settings::DeviceDb_SQLite:
+        ui->radioButtonUseSqlite->setChecked(true);
+        break;
+    case Settings::DeviceDb_XML:
+        ui->radioButtonUseXML->setChecked(true);
+        break;
+    }
+
     programmerSelected();
     ui->checkBoxNoIcons->hide();// FIXME workaround
     ui->lineEditAvrDudePath->setText(settings->dudePath);
     ui->lineEditXmlsPath->setText(settings->xmlsPath);
+    ui->lineEditSQLitePath->setText(settings->sqlitePath);
     ui->checkBoxOverrideProgrammersOptions->setChecked(settings->particularProgOptions);
     on_checkBoxOverrideProgrammersOptions_toggled(settings->particularProgOptions);
     ui->lineEditProgOptions->setText(settings->programmerOptions);
@@ -50,10 +70,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     fuseValueDelegate = new RegisterValueDelegate(this);
     ui->tableViewFuses->setItemDelegateForColumn(1, fuseValueDelegate);
+    ui->tableViewFuses->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
     fuseFieldDelegate = new BitFieldDelegate(this);
     ui->tableViewFuseFields->setItemDelegateForColumn(1, fuseFieldDelegate);
     ui->tableViewFuseFields->horizontalHeader()->setStretchLastSection(true);
+    ui->tableViewFuseFields->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
     // setupt the lockbits gui stuff
     ui->tableViewLockBitFields->setModel(avrPart->lockByteModel());
@@ -86,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     QDir xmlDir(settings->xmlsPath);
-    if ((!xmlDir.exists()) || (xmlDir.entryList(QStringList("*.xml")).isEmpty())) {
+    if (((!xmlDir.exists()) || (xmlDir.entryList(QStringList("*.xml")).isEmpty())) && settings->deviceData == Settings::DeviceDb_XML) {
         QMessageBox xmlMsg(QMessageBox::Critical,
                            tr("The xml files directory does not exists, or it does not contains XML files"),
                            tr("The program is using AVR description XML files.\n"
@@ -95,7 +117,9 @@ MainWindow::MainWindow(QWidget *parent) :
                               "and browse the PartDescriptionFiles directory from the Avrstudio's install dir.\n"
                               "If you do not have Avrstudio you can obtain it from the "
                               "<a href='http://www.atmel.com/dyn/products/tools_card.asp?tool_id=2725'>Atmel's website</a> for free.\n"
-                              "If you can't or don't want to download it do not worry, the basic functions will work without it."));
+                              "If you can't or don't want to download it do not worry, the basic functions will work without it."
+                              "It is possible to get the device data from an SQLite database, which is provided by the qavrdude-data package.\n"
+                              "Check your settings tab about this mode!"));
         xmlMsg.setTextFormat(Qt::RichText);
         xmlMsg.exec();
         ui->tabWidgetMain->setCurrentWidget(ui->tabSettings);
@@ -788,4 +812,33 @@ void MainWindow::on_pushButtonWriteVoltages_clicked()
     avrProgrammer->setVoltagesSTK500(ui->doubleSpinBoxVTarget->value(),
                                      ui->doubleSpinBoxAREF0->value(),
                                      ui->doubleSpinBoxAREF1->value());
+}
+
+
+void MainWindow::on_radioButtonUseXML_clicked()
+{
+    settings->deviceData = Settings::DeviceDb_XML;
+}
+
+void MainWindow::on_radioButtonUseSqlite_clicked()
+{
+    settings->deviceData = Settings::DeviceDb_SQLite;
+}
+
+void MainWindow::on_pushButtonBrowseSqlite_clicked()
+{
+    QFileInfo fi(settings->sqlitePath);
+    QString sqliteDir = fi.path();
+    if (sqliteDir == "")
+        sqliteDir = QDir::homePath();
+    QString str = QFileDialog::getOpenFileName(this, tr("Select the SQLite database"), sqliteDir, tr("SQLite databases(*.sqlite)"));
+    if (!str.isEmpty()) {
+        settings->sqlitePath = str;
+        ui->lineEditSQLitePath->setText(str);
+    }
+}
+
+void MainWindow::on_lineEditProgOptions_editingFinished()
+{
+
 }

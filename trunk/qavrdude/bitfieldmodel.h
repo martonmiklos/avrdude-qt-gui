@@ -30,6 +30,7 @@ public:
 
     int mask() const {return m_mask;}
     bool isEnum() const {return m_isEnum;}
+    void setEnum(bool e) {m_isEnum = e;}
 
     void setValue(int value) {m_value = value;}
     int value() const {return m_value;}

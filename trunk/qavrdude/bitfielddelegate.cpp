@@ -25,7 +25,7 @@ QWidget *BitFieldDelegate::createEditor(QWidget *parent,
         BitFieldCheckBox *editor = new BitFieldCheckBox(parent);
         connect(editor, SIGNAL(commitDataSignal(QWidget*)), this, SIGNAL(commitData(QWidget*)));
         editor->setAutoFillBackground(true);
-        editor->setChecked(field.value() != 0);
+        editor->setChecked(field.value() == 0);
         return editor;
     }
     return QStyledItemDelegate::createEditor(parent, option, index);

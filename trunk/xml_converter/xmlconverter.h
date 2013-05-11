@@ -17,13 +17,15 @@ class XMLConverter : public QObject
 public:
     explicit XMLConverter(QObject *parent = 0);
     bool convert(QString sqlite, QString xmlsDir);
+    bool truncate(QString sqlite);
+
     QString error() const {return errorString;}
 signals:
     void logMessage(QString msg);
 public slots:
 
 private:
-    void sqlError(QSqlQuery *query);
+    bool sqlError(QSqlQuery *query);
     bool parseFile(QString file);
 
     QFile domFile;

@@ -1,12 +1,15 @@
-#include <QtGui/QApplication>
+#include <QtGui>
+#include <QApplication>
 #include <QtCore/QTextCodec>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-    
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+#endif
+
     QCoreApplication::setOrganizationName("MM");
     QCoreApplication::setApplicationName("QAvrdude");
     QCoreApplication::setApplicationVersion("0.1");

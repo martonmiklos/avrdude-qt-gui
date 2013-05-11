@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QUrl>
 #include <QSplitter>
+#include <QCompleter>
 
 #include "avrprogrammer.h"
 #include "settings.h"
@@ -39,12 +40,15 @@ private:
     QStringList deviceNames;
     QCompleter *nameCompleter;
     Settings *settings;
+    QButtonGroup *dataSourceButtonGroup;
 
     QLabel *statusBarLabel;
     QMenu *textOutPutMenu;
 
     BitFieldDelegate *lockFieldDelegate, *fuseFieldDelegate;
     RegisterValueDelegate *fuseValueDelegate;
+
+    QCompleter *programmerArgumentsCompleter;
 
     void fillDeviceList();
     void fillProgrammersList();
@@ -98,6 +102,10 @@ private slots:
     void on_pushButtonVerifyFuses_clicked();
     void on_pushButtonReadVoltages_clicked();
     void on_pushButtonWriteVoltages_clicked();
+    void on_radioButtonUseXML_clicked();
+    void on_radioButtonUseSqlite_clicked();
+    void on_pushButtonBrowseSqlite_clicked();
+    void on_lineEditProgOptions_editingFinished();
 };
 
 #endif // MAINWINDOW_H

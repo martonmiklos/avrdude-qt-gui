@@ -1,6 +1,8 @@
 #include "avrpart.h"
 #include <QDir>
 
+
+
 AvrPart::AvrPart(Settings *sa, QString name, QObject *parent)
     : QObject(parent), settings(sa)
 {
@@ -123,6 +125,13 @@ AvrPart::AvrPart(Settings *sa, QString name, QObject *parent)
     m_fuseFieldsModel->setRegisters(&fuseRegs);
     m_lockByteFieldsModel->setRegisters(&lockBytes);
 
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    if (settings->deviceData == Settings::DeviceDb_SQLite) {
+        db.setDatabaseName(settings->sqlitePath);
+        if (!db.open()) {
+        }
+    }
+
     setPartName(name); // do it only after the creating of the model objects
 }
 
@@ -177,11 +186,11 @@ bool AvrPart::setPartName(QString name)
             throw QString(tr("Could not find the <SIGNATURE> key in the %1.xml file")).arg(name);
         }
 
-        avrdudePartNo = getAvrDudePartNo(name);
-        if (avrdudePartNo.isNull()) {
+        m_avrdudePartNo = getAvrDudePartNo(name);
+        if (m_avrdudePartNo.isNull()) {
             throw (QString(tr("Unsupported part")));
         } else {
-            partNameStr = name;
+            m_partNameStr = name;
             if (!fillFuseAndLockData()) {
                 throw QString(tr("Unable to read fuse information"));
             }
@@ -189,7 +198,7 @@ bool AvrPart::setPartName(QString name)
         }
     } catch (QString ex) {
         errorString = ex;
-        partNameStr = tr("Invalid xml file");
+        m_partNameStr = tr("Invalid xml file");
         return false;
     }
 }
@@ -205,6 +214,88 @@ QString AvrPart::getAvrDudePartNo(QString name) const
 
 bool AvrPart::fillFuseAndLockData()
 {
+    switch (settings->deviceData) {
+    case Settings::DeviceDb_SQLite:
+        return fillFuseAndLockDataFromSQLite();
+        break;
+    case Settings::DeviceDb_XML:
+        return fillFuseAndLockDataFromXML();
+        break;
+    }
+    return false;
+}
+
+bool AvrPart::fillFuseAndLockDataFromSQLite()
+{
+    while (fuseRegs.size()) {
+        delete fuseRegs.takeFirst();
+    }
+
+    while (lockBytes.size()) {
+        delete lockBytes.takeFirst();
+    }
+
+    if (db.isOpen()) {
+        QSqlQuery deviceIdQuery(db);
+        deviceIdQuery.prepare("SELECT id from devices where name = :name");
+        deviceIdQuery.bindValue(":name", m_partNameStr);
+        if (!deviceIdQuery.exec()) {
+            return false;
+        }
+        deviceIdQuery.next();
+
+        QSqlQuery registersQuery(db);
+        registersQuery.prepare("SELECT dr.id,  dt.name from devices_registers dr, device_register_types dt  "
+                               "where device_id=:device_id and dt.id = dr.type_id");
+        registersQuery.bindValue(":device_id", deviceIdQuery.value(0).toInt());
+        if (!registersQuery.exec()) {
+            return false;
+        }
+
+        while (registersQuery.next()) {
+            Register *currentRegister = new Register(registersQuery.value(1).toString(), 0, 0); // FIXME offset, size
+            QSqlQuery bitFieldQuery(db);
+            bitFieldQuery.prepare("SELECT name, short_name, mask, id FROM bitfields WHERE register_id=:id");
+            bitFieldQuery.bindValue(":id", registersQuery.value(0).toInt());
+            if (!bitFieldQuery.exec()) {
+                return false;
+            }
+            while (bitFieldQuery.next()) {
+                BitField currentBitField(bitFieldQuery.value(0).toString(),
+                                         bitFieldQuery.value(1).toString(),
+                                         bitFieldQuery.value(2).toInt(),
+                                         0,
+                                         false);
+
+                QSqlQuery enumQuery(db);
+                enumQuery.prepare("SELECT name, mask, value, text FROM bitfields_enums WHERE bitfield_id=:id");
+                enumQuery.bindValue(":id", bitFieldQuery.value(3).toInt());
+                if (!enumQuery.exec()) {
+                    return false;
+                }
+                if (enumQuery.size()) {
+                    currentBitField.setEnum(true);
+                    while (enumQuery.next()) {
+                        currentBitField.addEnumValue(enumQuery.value(2).toInt(), enumQuery.value(3).toString());
+                    }
+                }
+                currentRegister->addBitField(currentBitField);
+            }
+
+            if (registersQuery.value(1).toString().startsWith("LOCK")) {
+                lockBytes.append(currentRegister);
+            } else {
+                fuseRegs.append(currentRegister);
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
+bool AvrPart::fillFuseAndLockDataFromXML()
+{
     while (fuseRegs.size()) {
         delete fuseRegs.takeFirst();
     }
@@ -214,9 +305,9 @@ bool AvrPart::fillFuseAndLockData()
     }
 
     try {
-        domFile.setFileName(settings->xmlsPath+"/"+partNameStr+".xml");
+        domFile.setFileName(settings->xmlsPath+"/"+m_partNameStr+".xml");
         if (!domFile.open(QFile::ReadOnly))  {
-            throw QString(tr("Could not open the %1 xml file")).arg(partNameStr+".xml");
+            throw QString(tr("Could not open the %1 xml file")).arg(m_partNameStr+".xml");
         }
 
         if (!domDoc.setContent(&domFile)) {

@@ -7,6 +7,10 @@
 #include <QtCore/QFile>
 #include <QDebug>
 #include <QStringList>
+#include <QSqlQuery>
+#include <QSqlDatabase>
+#include <QSqlError>
+
 #include "settings.h"
 #include "bitfieldmodel.h"
 
@@ -15,7 +19,7 @@ class AvrPart : public QObject
     Q_OBJECT
 public:
     AvrPart(Settings *sa, QString name, QObject *parent = 0);
-    QString getPartName() const {return partNameStr;}
+    QString getPartName() const {return m_partNameStr;}
     bool setPartName(QString pn);
     QString getSignature() const;
     QString error() const {return errorString;}
@@ -38,8 +42,8 @@ public:
 
 private:
     // avr related variables
-    QString partNameStr; // teh normal name of the controller (for e.g Atmega8)
-    QString avrdudePartNo; // the partname in avrdude option stlyle representation (for e.g. m8 for Atmega8)
+    QString m_partNameStr; // teh normal name of the controller (for e.g Atmega8)
+    QString m_avrdudePartNo; // the partname in avrdude option stlyle representation (for e.g. m8 for Atmega8)
 
     QString errorString;
 
@@ -48,6 +52,8 @@ private:
     QFile domFile;
 
     bool fillFuseAndLockData();
+    bool fillFuseAndLockDataFromXML();
+    bool fillFuseAndLockDataFromSQLite();
     bool findXml(QString);
     QMap<QString, QString> dudePartNos;
     Settings *settings;
@@ -57,6 +63,8 @@ private:
 
     RegistersModel *m_lockBytesModel;
     RegisterFieldsModel *m_lockByteFieldsModel;
+
+    QSqlDatabase db;
 };
 
 #endif // AVRPART_H

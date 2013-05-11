@@ -6,1313 +6,1469 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
-    <height>705</height>
+    <width>789</width>
+    <height>719</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Avrdude Frontend</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QTabWidget" name="tabWidgetMain">
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
+   <layout class="QGridLayout" name="gridLayout_18">
+    <item row="0" column="0">
+     <widget class="QSplitter" name="splitter_3">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-      <property name="tabShape">
-       <enum>QTabWidget::Rounded</enum>
-      </property>
-      <property name="currentIndex">
-       <number>3</number>
-      </property>
-      <widget class="QWidget" name="tabMain">
-       <attribute name="title">
-        <string>Main</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_6">
-        <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Device and Signature Bytes</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QComboBox" name="comboBoxDevice"/>
-           </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="pushButton">
+      <widget class="QTabWidget" name="tabWidgetMain">
+       <property name="tabPosition">
+        <enum>QTabWidget::North</enum>
+       </property>
+       <property name="tabShape">
+        <enum>QTabWidget::Triangular</enum>
+       </property>
+       <property name="currentIndex">
+        <number>8</number>
+       </property>
+       <property name="elideMode">
+        <enum>Qt::ElideNone</enum>
+       </property>
+       <widget class="QWidget" name="tabMain">
+        <attribute name="title">
+         <string>Main</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>Device and Signature Bytes</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+             <widget class="QComboBox" name="comboBoxDevice"/>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>Erase device</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons/icons.qrc">
+                <normaloff>:/edit-delete.svg</normaloff>:/edit-delete.svg</iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLineEdit" name="lineEditDevSignature">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labelSignatureMatch">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="pushButtonReadSignature">
+              <property name="text">
+               <string>Read Signature</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxProgModeAndTarget">
+           <property name="title">
+            <string>Programming Mode and Target Settings</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="QComboBox" name="comboBoxIspMode"/>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="pushButtonProgmodeSettings">
+              <property name="text">
+               <string>Settings</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons/icons.qrc">
+                <normaloff>:/gconf-editor.svg</normaloff>:/gconf-editor.svg</iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="labelISPFreq">
+              <property name="text">
+               <string>ISP Frequency</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabProgram">
+        <attribute name="icon">
+         <iconset resource="icons/icons.qrc">
+          <normaloff>:/avr.svg</normaloff>:/avr.svg</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>Program</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QGroupBox" name="groupBoxDevice">
+           <property name="title">
+            <string>Device</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <widget class="QPushButton" name="pushButtonErase">
+                <property name="text">
+                 <string>Erase</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons/icons.qrc">
+                  <normaloff>:/edit-delete.svg</normaloff>:/edit-delete.svg</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBoxEraseWhat"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QCheckBox" name="checkBoxEraseBeforeProg">
+                <property name="text">
+                 <string>Erase device before flash programming</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxVerifyAfterProg">
+                <property name="text">
+                 <string>Verify after device programming</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxFlash">
+           <property name="title">
+            <string>Flash</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayoutInputHex">
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="labelHexForFlash">
+                <property name="text">
+                 <string>Input Hex file:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="HexLineEdit" name="lineEditFlashHex"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayoutProgButtons">
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="pushButtonProgramFlash">
+                <property name="text">
+                 <string>Program</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons/icons.qrc">
+                  <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonVerifyFlash">
+                <property name="text">
+                 <string>Verify</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonReadReadFlash">
+                <property name="text">
+                 <string>Read</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons/icons.qrc">
+                  <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxEEPROM">
+           <property name="title">
+            <string>EEPROM</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Input Hex file:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="HexLineEdit" name="lineEditEEPROMHex"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_9">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayoutProgButtons_2">
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="pushButtonProgramEEPROM">
+                <property name="text">
+                 <string>Program</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons/icons.qrc">
+                  <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonVerifyEEPROM">
+                <property name="text">
+                 <string>Verify</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonReadReadEEPROM">
+                <property name="text">
+                 <string>Read</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="icons/icons.qrc">
+                  <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_10">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabFuses">
+        <attribute name="icon">
+         <iconset resource="icons/icons.qrc">
+          <normaloff>:/fuse-64.png</normaloff>:/fuse-64.png</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>Fuses</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="labelFuseBiDisplaymode">
              <property name="text">
-              <string>Erase device</string>
+              <string>Fuse value display:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxFuseDisplaymode">
+             <item>
+              <property name="text">
+               <string>Hexadecimal</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Binary</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Decimal</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QSplitter" name="splitter">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <widget class="QTableView" name="tableViewFuses">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <attribute name="horizontalHeaderStretchLastSection">
+             <bool>true</bool>
+            </attribute>
+           </widget>
+           <widget class="QTableView" name="tableViewFuseFields">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <attribute name="horizontalHeaderStretchLastSection">
+             <bool>true</bool>
+            </attribute>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="checkBox">
+             <property name="text">
+              <string>Auto read</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonProgramFuses">
+             <property name="text">
+              <string>Program</string>
              </property>
              <property name="icon">
               <iconset resource="icons/icons.qrc">
-               <normaloff>:/edit-delete.svg</normaloff>:/edit-delete.svg</iconset>
+               <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLineEdit" name="lineEditDevSignature">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="labelSignatureMatch">
+           <item>
+            <widget class="QPushButton" name="pushButtonVerifyFuses">
              <property name="text">
-              <string/>
+              <string>Verify</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QPushButton" name="pushButtonReadSignature">
+           <item>
+            <widget class="QPushButton" name="pushButtonReadFuses">
              <property name="text">
-              <string>Read Signature</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBoxProgModeAndTarget">
-          <property name="title">
-           <string>Programming Mode and Target Settings</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <widget class="QComboBox" name="comboBoxIspMode"/>
-           </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="pushButtonProgmodeSettings">
-             <property name="text">
-              <string>Settings</string>
+              <string>Read</string>
              </property>
              <property name="icon">
               <iconset resource="icons/icons.qrc">
-               <normaloff>:/gconf-editor.svg</normaloff>:/gconf-editor.svg</iconset>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="labelISPFreq">
-             <property name="text">
-              <string>ISP Frequency</string>
+               <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
              </property>
             </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabProgram">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/avr.svg</normaloff>:/avr.svg</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Program</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QGroupBox" name="groupBoxDevice">
-          <property name="title">
-           <string>Device</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <item>
-              <widget class="QPushButton" name="pushButtonErase">
-               <property name="text">
-                <string>Erase</string>
-               </property>
-               <property name="icon">
-                <iconset resource="icons/icons.qrc">
-                 <normaloff>:/edit-delete.svg</normaloff>:/edit-delete.svg</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBoxEraseWhat"/>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QCheckBox" name="checkBoxEraseBeforeProg">
-               <property name="text">
-                <string>Erase device before flash programming</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="checkBoxVerifyAfterProg">
-               <property name="text">
-                <string>Verify after device programming</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBoxFlash">
-          <property name="title">
-           <string>Flash</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayoutInputHex">
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="labelHexForFlash">
-               <property name="text">
-                <string>Input Hex file:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="HexLineEdit" name="lineEditFlashHex"/>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayoutProgButtons">
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="pushButtonProgramFlash">
-               <property name="text">
-                <string>Program</string>
-               </property>
-               <property name="icon">
-                <iconset resource="icons/icons.qrc">
-                 <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonVerifyFlash">
-               <property name="text">
-                <string>Verify</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonReadReadFlash">
-               <property name="text">
-                <string>Read</string>
-               </property>
-               <property name="icon">
-                <iconset resource="icons/icons.qrc">
-                 <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBoxEEPROM">
-          <property name="title">
-           <string>EEPROM</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Input Hex file:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="HexLineEdit" name="lineEditEEPROMHex"/>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayoutProgButtons_2">
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="pushButtonProgramEEPROM">
-               <property name="text">
-                <string>Program</string>
-               </property>
-               <property name="icon">
-                <iconset resource="icons/icons.qrc">
-                 <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonVerifyEEPROM">
-               <property name="text">
-                <string>Verify</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonReadReadEEPROM">
-               <property name="text">
-                <string>Read</string>
-               </property>
-               <property name="icon">
-                <iconset resource="icons/icons.qrc">
-                 <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabFuses">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/fuse-64.png</normaloff>:/fuse-64.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Fuses</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_7">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <item>
-           <widget class="QLabel" name="labelFuseBiDisplaymode">
-            <property name="text">
-             <string>Fuse value display:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="comboBoxFuseDisplaymode">
-            <item>
-             <property name="text">
-              <string>Hexadecimal</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Binary</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Decimal</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QSplitter" name="splitter">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <widget class="QTableView" name="tableViewFuses">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabLockBits">
+        <attribute name="icon">
+         <iconset resource="icons/icons.qrc">
+          <normaloff>:/locked.svg</normaloff>:/locked.svg</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>LockBits</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QSplitter" name="splitter_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
-           <property name="autoFillBackground">
-            <bool>true</bool>
-           </property>
-           <attribute name="horizontalHeaderStretchLastSection">
-            <bool>true</bool>
-           </attribute>
+           <widget class="QTableView" name="tableViewLockBits"/>
+           <widget class="QTableView" name="tableViewLockBitFields"/>
           </widget>
-          <widget class="QTableView" name="tableViewFuseFields">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <property name="bottomMargin">
+            <number>0</number>
            </property>
-           <attribute name="horizontalHeaderStretchLastSection">
-            <bool>true</bool>
-           </attribute>
+           <item>
+            <widget class="QCheckBox" name="checkBoxAutoReadLockbits">
+             <property name="text">
+              <string>Auto read</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonProgramLockbits">
+             <property name="text">
+              <string>Program</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons/icons.qrc">
+               <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonVerifyLockbits">
+             <property name="text">
+              <string>Verify</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonReadLockbits">
+             <property name="text">
+              <string>Read</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons/icons.qrc">
+               <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabAdvanced">
+        <attribute name="icon">
+         <iconset resource="icons/icons.qrc">
+          <normaloff>:/preferences-system.svg</normaloff>:/preferences-system.svg</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>Advanced</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <item>
+          <widget class="QGroupBox" name="groupBoxOscal">
+           <property name="title">
+            <string>Oscillator Calibration Byte</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0" colspan="2">
+             <widget class="QLabel" name="labelCalibrateFreq">
+              <property name="text">
+               <string>Calibrate for freqency</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QComboBox" name="comboBoxOscalFreq"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Value</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Address</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2" rowspan="2">
+             <widget class="QRadioButton" name="radioButtonFlash">
+              <property name="text">
+               <string>Flash</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QPushButton" name="pushButtonReadOscal">
+              <property name="text">
+               <string>Read</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" rowspan="2">
+             <widget class="QLineEdit" name="lineEditOscalValue"/>
+            </item>
+            <item row="3" column="1" rowspan="2">
+             <widget class="QLineEdit" name="lineEditOscalAdress"/>
+            </item>
+            <item row="4" column="2">
+             <widget class="QRadioButton" name="radioButtonEEPROM">
+              <property name="text">
+               <string>EEPROM</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="3">
+             <widget class="QPushButton" name="pushButtonWriteOscal">
+              <property name="text">
+               <string>Write</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="4">
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QCheckBox" name="checkBox">
-            <property name="text">
-             <string>Auto read</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonProgramFuses">
-            <property name="text">
-             <string>Program</string>
-            </property>
-            <property name="icon">
-             <iconset resource="icons/icons.qrc">
-              <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonVerifyFuses">
-            <property name="text">
-             <string>Verify</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonReadFuses">
-            <property name="text">
-             <string>Read</string>
-            </property>
-            <property name="icon">
-             <iconset resource="icons/icons.qrc">
-              <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabLockBits">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/locked.svg</normaloff>:/locked.svg</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>LockBits</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_8">
-        <item>
-         <widget class="QSplitter" name="splitter_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <widget class="QTableView" name="tableViewLockBits"/>
-          <widget class="QTableView" name="tableViewLockBitFields"/>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QCheckBox" name="checkBoxAutoReadLockbits">
-            <property name="text">
-             <string>Auto read</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonProgramLockbits">
-            <property name="text">
-             <string>Program</string>
-            </property>
-            <property name="icon">
-             <iconset resource="icons/icons.qrc">
-              <normaloff>:/write_avr.svg</normaloff>:/write_avr.svg</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonVerifyLockbits">
-            <property name="text">
-             <string>Verify</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonReadLockbits">
-            <property name="text">
-             <string>Read</string>
-            </property>
-            <property name="icon">
-             <iconset resource="icons/icons.qrc">
-              <normaloff>:/read_avr.svg</normaloff>:/read_avr.svg</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabAdvanced">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/preferences-system.svg</normaloff>:/preferences-system.svg</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Advanced</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_9">
-        <item>
-         <widget class="QGroupBox" name="groupBoxOscal">
-          <property name="title">
-           <string>Oscillator Calibration Byte</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0" colspan="2">
-            <widget class="QLabel" name="labelCalibrateFreq">
-             <property name="text">
-              <string>Calibrate for freqency</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QComboBox" name="comboBoxOscalFreq"/>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Value</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Address</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2" rowspan="2">
-            <widget class="QRadioButton" name="radioButtonFlash">
-             <property name="text">
-              <string>Flash</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="3">
-            <widget class="QPushButton" name="pushButtonReadOscal">
-             <property name="text">
-              <string>Read</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0" rowspan="2">
-            <widget class="QLineEdit" name="lineEditOscalValue"/>
-           </item>
-           <item row="3" column="1" rowspan="2">
-            <widget class="QLineEdit" name="lineEditOscalAdress"/>
-           </item>
-           <item row="4" column="2">
-            <widget class="QRadioButton" name="radioButtonEEPROM">
-             <property name="text">
-              <string>EEPROM</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="3">
-            <widget class="QPushButton" name="pushButtonWriteOscal">
-             <property name="text">
-              <string>Write</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="4">
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabHWSettings">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/gconf-editor.svg</normaloff>:/gconf-editor.svg</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>HW settings</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_10">
-        <item>
-         <widget class="QGroupBox" name="groupBoxVoltages">
-          <property name="title">
-           <string>Voltages</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_8">
-           <item row="1" column="0">
-            <widget class="QLabel" name="labelVtarget">
-             <property name="text">
-              <string>VTarget:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QSlider" name="horizontalSliderVTarget">
-             <property name="maximum">
-              <number>60</number>
-             </property>
-             <property name="value">
-              <number>50</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="labelAREF0">
-             <property name="text">
-              <string>AREF0:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1" colspan="2">
-            <widget class="QSlider" name="horizontalSliderAREF0">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="labelAREF1">
-             <property name="text">
-              <string>AREF1:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1" colspan="2">
-            <widget class="QSlider" name="horizontalSliderAREF1">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QPushButton" name="pushButtonReadVoltages">
-             <property name="text">
-              <string>Read</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="2">
-            <widget class="QPushButton" name="pushButtonWriteVoltages">
-             <property name="text">
-              <string>Write</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="3">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxAREF1">
-             <property name="suffix">
-              <string> V</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="3">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxAREF0">
-             <property name="suffix">
-              <string> V</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxVTarget">
-             <property name="suffix">
-              <string> V</string>
-             </property>
-             <property name="value">
-              <double>5.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBoxClockGenerator">
-          <property name="title">
-           <string>Clock generator</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_12">
-           <item row="0" column="3">
-            <widget class="QLabel" name="labelClockValue">
-             <property name="text">
-              <string>0.0Mhz</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="3">
-            <widget class="QSlider" name="horizontalSliderClkGenVal">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxClockValue"/>
-           </item>
-           <item row="2" column="1">
-            <widget class="QPushButton" name="pushButtonReadClkGenVal">
-             <property name="text">
-              <string>Read</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QPushButton" name="pushButtonWriteClkGenVal">
-             <property name="text">
-              <string>Write</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabAVRDudeOutput">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/utilities-terminal.svg</normaloff>:/utilities-terminal.svg</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>AVRDude output</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0" colspan="2">
-         <widget class="QTextEdit" name="textEditAvrDudeOutPut">
-          <property name="overwriteMode">
-           <bool>true</bool>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QCheckBox" name="checkBoxShowAvrDudeOutput">
-          <property name="text">
-           <string>Show AvrDude output</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="pushButtonClearAvrDudeOutput">
-          <property name="text">
-           <string>Clear</string>
-          </property>
-          <property name="icon">
-           <iconset resource="icons/icons.qrc">
-            <normaloff>:/edit-clear.svg</normaloff>:/edit-clear.svg</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>14</width>
-            <height>14</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabSettings">
-       <attribute name="title">
-        <string>Settings</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="2" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBoxPaths">
-          <property name="title">
-           <string>Paths</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_9">
-           <item row="0" column="0">
-            <widget class="QLabel" name="partDescriptionXMLsLabel">
-             <property name="text">
-              <string>Part description XMLs:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEditXmlsPath"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="avrdudeLabel">
-             <property name="text">
-              <string>Avrdude binary:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEditAvrDudePath"/>
-           </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="pushButtonBrowseXmls">
-             <property name="text">
-              <string>Browse</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QPushButton" name="pushButtonAvrDude">
-             <property name="text">
-              <string>Browse</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox_7">
-          <property name="title">
-           <string>GUI settings</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_10">
-           <item row="0" column="0" colspan="2">
-            <widget class="QCheckBox" name="checkBoxLastTabRemember">
-             <property name="text">
-              <string>Remember to the last used tab</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QComboBox" name="comboBoxDefaultTab"/>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="labelDefaultTab">
-             <property name="text">
-              <string>Default tab:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="checkBoxNoIcons">
-             <property name="text">
-              <string>Do not show icons</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabSelectProgrammer">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/Usb-svg.svg</normaloff>:/Usb-svg.svg</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Programmer</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_5">
-          <property name="title">
-           <string>Programmer</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_7">
-           <item row="5" column="0" colspan="3">
-            <widget class="QCheckBox" name="checkBoxOverrideProgrammersOptions">
-             <property name="text">
-              <string>Override programmer type with the following arguments:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="1">
-            <spacer name="verticalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="1" colspan="2">
-            <widget class="QLineEdit" name="lineEditProgrammerPort"/>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="labelProgrammerport">
-             <property name="text">
-              <string>Port</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0" colspan="3">
-            <widget class="QLineEdit" name="lineEditProgOptions"/>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QComboBox" name="comboBoxProgrammer"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="labelProgrammertype">
-             <property name="text">
-              <string>Programmer type:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="labelCurretnArguments">
-             <property name="text">
-              <string>Current arguments:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLabel" name="labelCurrentArgumentsValue">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabMFileGenerator">
-       <attribute name="title">
-        <string>Makefile generator</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_15">
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBoxCompilerOptions">
-          <property name="title">
-           <string>Compiler options</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_13">
-           <item row="0" column="0">
-            <widget class="QLabel" name="mainFileNameLabel">
-             <property name="text">
-              <string>Main file name:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="mainFileNameLineEdit"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="outputFormatLabel">
-             <property name="text">
-              <string>Output format:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QComboBox" name="outputFormatComboBox">
-             <item>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabHWSettings">
+        <attribute name="icon">
+         <iconset resource="icons/icons.qrc">
+          <normaloff>:/gconf-editor.svg</normaloff>:/gconf-editor.svg</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>HW settings</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <item>
+          <widget class="QGroupBox" name="groupBoxVoltages">
+           <property name="title">
+            <string>Voltages</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="1" column="0">
+             <widget class="QLabel" name="labelVtarget">
               <property name="text">
-               <string>srec</string>
+               <string>VTarget:</string>
               </property>
-             </item>
-             <item>
+             </widget>
+            </item>
+            <item row="1" column="1" colspan="2">
+             <widget class="QSlider" name="horizontalSliderVTarget">
+              <property name="maximum">
+               <number>60</number>
+              </property>
+              <property name="value">
+               <number>50</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labelAREF0">
               <property name="text">
-               <string>ihex</string>
+               <string>AREF0:</string>
               </property>
-             </item>
-             <item>
+             </widget>
+            </item>
+            <item row="2" column="1" colspan="2">
+             <widget class="QSlider" name="horizontalSliderAREF0">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="labelAREF1">
               <property name="text">
-               <string>binary</string>
+               <string>AREF1:</string>
               </property>
-             </item>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="optimaliztationLevelLabel">
-             <property name="text">
-              <string>Optimaliztation level:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QComboBox" name="optimaliztationLevelComboBox">
-             <item>
+             </widget>
+            </item>
+            <item row="3" column="1" colspan="2">
+             <widget class="QSlider" name="horizontalSliderAREF1">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QPushButton" name="pushButtonReadVoltages">
               <property name="text">
-               <string>0</string>
+               <string>Read</string>
               </property>
-             </item>
-             <item>
+             </widget>
+            </item>
+            <item row="4" column="2">
+             <widget class="QPushButton" name="pushButtonWriteVoltages">
               <property name="text">
-               <string>1</string>
+               <string>Write</string>
               </property>
-             </item>
-             <item>
+             </widget>
+            </item>
+            <item row="3" column="3">
+             <widget class="QDoubleSpinBox" name="doubleSpinBoxAREF1">
+              <property name="suffix">
+               <string> V</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QDoubleSpinBox" name="doubleSpinBoxAREF0">
+              <property name="suffix">
+               <string> V</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QDoubleSpinBox" name="doubleSpinBoxVTarget">
+              <property name="suffix">
+               <string> V</string>
+              </property>
+              <property name="value">
+               <double>5.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxClockGenerator">
+           <property name="title">
+            <string>Clock generator</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_12">
+            <item row="0" column="3">
+             <widget class="QLabel" name="labelClockValue">
               <property name="text">
-               <string>s</string>
+               <string>0.0Mhz</string>
               </property>
-             </item>
-             <item>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="3">
+             <widget class="QSlider" name="horizontalSliderClkGenVal">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QDoubleSpinBox" name="doubleSpinBoxClockValue"/>
+            </item>
+            <item row="2" column="1">
+             <widget class="QPushButton" name="pushButtonReadClkGenVal">
               <property name="text">
-               <string>2</string>
+               <string>Read</string>
               </property>
-             </item>
-             <item>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="pushButtonWriteClkGenVal">
               <property name="text">
-               <string>3</string>
+               <string>Write</string>
               </property>
-             </item>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="cStandardLevelLabel">
-             <property name="text">
-              <string>C standard level:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QComboBox" name="cStandardLevelComboBox"/>
-           </item>
-           <item row="4" column="0">
-            <spacer name="verticalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QGroupBox" name="groupBoxSourcefiles">
-          <property name="title">
-           <string>Source files:</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_14">
-           <item row="0" column="0" rowspan="4">
-            <widget class="QTableView" name="tableView"/>
-           </item>
-           <item row="1" column="1">
-            <widget class="QPushButton" name="pushButtonRemoveSource">
-             <property name="text">
-              <string>-</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <spacer name="verticalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>117</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="pushButtonAddSource">
-             <property name="text">
-              <string>+</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="2" colspan="2">
-         <widget class="QGroupBox" name="groupBoxMakefileOtherSettings">
-          <property name="title">
-           <string>Other options:</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_16">
-           <item row="0" column="0">
-            <widget class="QLabel" name="printfOptionsLabel">
-             <property name="text">
-              <string>printf options</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="printfOptionsComboBox"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="sscanfOptionsLabel">
-             <property name="text">
-              <string>sscanf options</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QComboBox" name="sscanfOptionsComboBox"/>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="externalRamLabel">
-             <property name="text">
-              <string>Use external RAM</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="useExternalRamCheckBox"/>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="externalRAMTypeLabel">
-             <property name="text">
-              <string>External RAM type:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QComboBox" name="externalRAMTypeComboBox"/>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="externalRAMStartLabel">
-             <property name="text">
-              <string>External RAM start:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QComboBox" name="externalRAMStartComboBox"/>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="externalRAMEndLabel">
-             <property name="text">
-              <string>External RAM end:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QComboBox" name="externalRAMEndComboBox"/>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="4">
-         <widget class="QTextEdit" name="textEditMakeFile"/>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLineEdit" name="lineEditMakefilePath"/>
-        </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="pushButtonMakefile">
-          <property name="text">
-           <string>Load</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3">
-         <widget class="QPushButton" name="pushButtonSaveMakeFile">
-          <property name="text">
-           <string>Save</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabAbout">
-       <attribute name="icon">
-        <iconset resource="icons/icons.qrc">
-         <normaloff>:/help-about.svg</normaloff>:/help-about.svg</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>About</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_12">
-        <item>
-         <layout class="QGridLayout" name="gridLayout_17"/>
-        </item>
-        <item>
-         <widget class="QTextBrowser" name="textBrowserAbout">
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabAVRDudeOutput">
+        <attribute name="icon">
+         <iconset resource="icons/icons.qrc">
+          <normaloff>:/utilities-terminal.svg</normaloff>:/utilities-terminal.svg</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>AVRDude output</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0" colspan="2">
+          <widget class="QTextEdit" name="textEditAvrDudeOutPut">
+           <property name="overwriteMode">
+            <bool>true</bool>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="checkBoxShowAvrDudeOutput">
+           <property name="text">
+            <string>Show AvrDude output</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="pushButtonClearAvrDudeOutput">
+           <property name="text">
+            <string>Clear</string>
+           </property>
+           <property name="icon">
+            <iconset resource="icons/icons.qrc">
+             <normaloff>:/edit-clear.svg</normaloff>:/edit-clear.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>14</width>
+             <height>14</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabSettings">
+        <attribute name="title">
+         <string>Settings</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="2" column="0" colspan="2">
+          <widget class="QGroupBox" name="groupBoxPaths">
+           <property name="title">
+            <string>Paths</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="1" column="0">
+             <widget class="QLabel" name="avrdudeLabel">
+              <property name="text">
+               <string>Avrdude binary:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="lineEditAvrDudePath"/>
+            </item>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="pushButtonAvrDude">
+              <property name="text">
+               <string>Browse</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="3">
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="title">
+               <string>Device  data</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_11">
+               <item row="1" column="2">
+                <widget class="QPushButton" name="pushButtonBrowseXmls">
+                 <property name="text">
+                  <string>Browse</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="lineEditSQLitePath"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Device database file:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="lineEditXmlsPath"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="partDescriptionXMLsLabel">
+                 <property name="text">
+                  <string>Part description XMLs:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <widget class="QPushButton" name="pushButtonBrowseSqlite">
+                 <property name="text">
+                  <string>Browse</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QRadioButton" name="radioButtonUseXML">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QRadioButton" name="radioButtonUseSqlite">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>Use:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLabel" name="labelSQLiteInfo">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QGroupBox" name="groupBox_7">
+           <property name="title">
+            <string>GUI settings</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="0" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBoxLastTabRemember">
+              <property name="text">
+               <string>Remember to the last used tab</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="comboBoxDefaultTab"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labelDefaultTab">
+              <property name="text">
+               <string>Default tab:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="checkBoxNoIcons">
+              <property name="text">
+               <string>Do not show icons</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabSelectProgrammer">
+        <attribute name="icon">
+         <iconset resource="icons/icons.qrc">
+          <normaloff>:/Usb-svg.svg</normaloff>:/Usb-svg.svg</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>Programmer</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_6">
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="title">
+            <string>Programmer</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="1" column="1" colspan="2">
+             <widget class="QComboBox" name="comboBoxProgrammer"/>
+            </item>
+            <item row="6" column="0" colspan="3">
+             <widget class="QCheckBox" name="checkBoxOverrideProgrammersOptions">
+              <property name="text">
+               <string>Override programmer type with the following arguments:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="3" column="1" colspan="2">
+             <widget class="QLineEdit" name="lineEditProgrammerPort"/>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="labelProgrammerport">
+              <property name="text">
+               <string>Port</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0" colspan="3">
+             <widget class="QLineEdit" name="lineEditProgOptions"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="labelProgrammertype">
+              <property name="text">
+               <string>Programmer type:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="labelCurretnArguments">
+              <property name="text">
+               <string>Current arguments:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QLabel" name="labelCurrentArgumentsValue">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Reset pin state after the programming:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1" colspan="2">
+             <widget class="QComboBox" name="comboBoxresetExitspec">
+              <item>
+               <property name="text">
+                <string>Undefined</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Hold in reset</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Release from reset</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabMFileGenerator">
+        <attribute name="title">
+         <string>Makefile generator</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_15">
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="groupBoxCompilerOptions">
+           <property name="title">
+            <string>Compiler options</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_13">
+            <item row="0" column="0">
+             <widget class="QLabel" name="mainFileNameLabel">
+              <property name="text">
+               <string>Main file name:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="mainFileNameLineEdit"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="outputFormatLabel">
+              <property name="text">
+               <string>Output format:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="outputFormatComboBox">
+              <item>
+               <property name="text">
+                <string>srec</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>ihex</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>binary</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="optimaliztationLevelLabel">
+              <property name="text">
+               <string>Optimaliztation level:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="optimaliztationLevelComboBox">
+              <item>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>1</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>s</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>2</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>3</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="cStandardLevelLabel">
+              <property name="text">
+               <string>C standard level:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QComboBox" name="cStandardLevelComboBox"/>
+            </item>
+            <item row="4" column="0">
+             <spacer name="verticalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QGroupBox" name="groupBoxSourcefiles">
+           <property name="title">
+            <string>Source files:</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_14">
+            <item row="0" column="0" rowspan="4">
+             <widget class="QTableView" name="tableView"/>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="pushButtonRemoveSource">
+              <property name="text">
+               <string>-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <spacer name="verticalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>117</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="pushButtonAddSource">
+              <property name="text">
+               <string>+</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="2" colspan="2">
+          <widget class="QGroupBox" name="groupBoxMakefileOtherSettings">
+           <property name="title">
+            <string>Other options:</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_16">
+            <item row="0" column="0">
+             <widget class="QLabel" name="printfOptionsLabel">
+              <property name="text">
+               <string>printf options</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="printfOptionsComboBox"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="sscanfOptionsLabel">
+              <property name="text">
+               <string>sscanf options</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="sscanfOptionsComboBox"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="externalRamLabel">
+              <property name="text">
+               <string>Use external RAM</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QCheckBox" name="useExternalRamCheckBox"/>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="externalRAMTypeLabel">
+              <property name="text">
+               <string>External RAM type:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QComboBox" name="externalRAMTypeComboBox"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="externalRAMStartLabel">
+              <property name="text">
+               <string>External RAM start:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QComboBox" name="externalRAMStartComboBox"/>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="externalRAMEndLabel">
+              <property name="text">
+               <string>External RAM end:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QComboBox" name="externalRAMEndComboBox"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="4">
+          <widget class="QTextEdit" name="textEditMakeFile"/>
+         </item>
+         <item row="2" column="0" colspan="2">
+          <widget class="QLineEdit" name="lineEditMakefilePath"/>
+         </item>
+         <item row="2" column="2">
+          <widget class="QPushButton" name="pushButtonMakefile">
+           <property name="text">
+            <string>Load</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="QPushButton" name="pushButtonSaveMakeFile">
+           <property name="text">
+            <string>Save</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabAbout">
+        <attribute name="icon">
+         <iconset resource="icons/icons.qrc">
+          <normaloff>:/help-about.svg</normaloff>:/help-about.svg</iconset>
+        </attribute>
+        <attribute name="title">
+         <string>About</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_12">
+         <item>
+          <layout class="QGridLayout" name="gridLayout_17"/>
+         </item>
+         <item>
+          <widget class="QTextBrowser" name="textBrowserAbout">
+           <property name="html">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;This program was written by &lt;/span&gt;&lt;a href=&quot;mailto:martonmiklosqdev@gmail.com&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt; text-decoration: underline; color:#0000ff;&quot;&gt;Miklós Márton&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;2011-2012&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;Special thanks to:&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;The AvrDude authors&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;Qt developers&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Алексей Слышик&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="openExternalLinks">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButtonAboutQt">
-          <property name="text">
-           <string>About Qt</string>
-          </property>
-          <property name="icon">
-           <iconset resource="icons/icons.qrc">
-            <normaloff>:/Qt-logo.svg_.png</normaloff>:/Qt-logo.svg_.png</iconset>
-          </property>
-         </widget>
-        </item>
-       </layout>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Алексей Слышик&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonAboutQt">
+           <property name="text">
+            <string>About Qt</string>
+           </property>
+           <property name="icon">
+            <iconset resource="icons/icons.qrc">
+             <normaloff>:/Qt-logo.svg_.png</normaloff>:/Qt-logo.svg_.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
-     </widget>
-    </item>
-    <item>
-     <widget class="QTextBrowser" name="textEditMessages">
-      <property name="openExternalLinks">
-       <bool>false</bool>
-      </property>
-      <property name="openLinks">
-       <bool>false</bool>
-      </property>
+      <widget class="QTextBrowser" name="textEditMessages">
+       <property name="openExternalLinks">
+        <bool>false</bool>
+       </property>
+       <property name="openLinks">
+        <bool>false</bool>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
