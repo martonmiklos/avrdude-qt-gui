@@ -160,7 +160,7 @@ bool AvrPart::setPartName(QString name)
 bool AvrPart::setPartNameFromSqlite(QString name)
 {
     QSqlQuery signatureQuery(db);
-    signatureQuery.prepare("SELECT S0, S1, S2 FROM device WHERE name = :name");
+    signatureQuery.prepare("SELECT S0, S1, S2 FROM devices WHERE name = :name");
     signatureQuery.bindValue(":name", name);
     if (signatureQuery.exec()) {
         if (signatureQuery.next()) {
@@ -169,6 +169,8 @@ bool AvrPart::setPartNameFromSqlite(QString name)
             sign2 = signatureQuery.value(2).toInt();
             return true;
         }
+    } else {
+        qWarning() << signatureQuery.lastError() << signatureQuery.lastQuery();
     }
     return false;
 }
