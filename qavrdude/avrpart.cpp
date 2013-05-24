@@ -167,7 +167,8 @@ bool AvrPart::setPartNameFromSqlite(QString name)
             sign0 = signatureQuery.value(0).toInt();
             sign1 = signatureQuery.value(1).toInt();
             sign2 = signatureQuery.value(2).toInt();
-            return true;
+            m_partNameStr = name;
+            return fillFuseAndLockData();
         }
     } else {
         qWarning() << signatureQuery.lastError() << signatureQuery.lastQuery();
