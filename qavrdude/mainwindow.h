@@ -43,7 +43,6 @@ private:
     QButtonGroup *dataSourceButtonGroup;
 
     QLabel *statusBarLabel;
-    QMenu *textOutPutMenu;
 
     BitFieldDelegate *lockFieldDelegate, *fuseFieldDelegate;
     RegisterValueDelegate *fuseValueDelegate;
@@ -55,6 +54,8 @@ private:
     void calculateArgumentsLabelText();
     void fillDefaultTabComboBox();
     void programmerSelected();
+
+    QProcess *m_programmerListQueryProcess;
 
 private slots:
     void on_horizontalSliderVTarget_sliderMoved(int position);
@@ -106,6 +107,8 @@ private slots:
     void on_radioButtonUseSqlite_clicked();
     void on_pushButtonBrowseSqlite_clicked();
     void on_lineEditProgOptions_editingFinished();
+    void on_textEditMessages_customContextMenuRequested(const QPoint &pos);
+    void programmerQueryFinished(int status, QProcess::ExitStatus exitStatus);
 };
 
 #endif // MAINWINDOW_H

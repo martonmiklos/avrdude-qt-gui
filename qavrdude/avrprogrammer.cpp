@@ -158,7 +158,7 @@ void AvrProgrammer::dudeFinished(int retcode)
         if (!retcode) {
             emit taskFinishedOk("Reading the program memory was successful.");
         } else {
-            emit taskFailed(QString(tr("Flash reading failed: avrdude retcode: %1.\n"
+            emit taskFailed(QString(tr("Flash reading failed: avrdude returned: %1.\n"
                                        "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
         }
         break;
@@ -166,7 +166,7 @@ void AvrProgrammer::dudeFinished(int retcode)
         if (!retcode) {
             emit taskFinishedOk("Programming the flash memory was successful.");
         } else {
-            emit taskFailed(QString(tr("Flash writing failed: avrdude retcode: %1.<br>"
+            emit taskFailed(QString(tr("Flash writing failed: avrdude returned: %1.<br>"
                                        "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
         }
         break;
@@ -174,7 +174,7 @@ void AvrProgrammer::dudeFinished(int retcode)
         if (!retcode) {
             emit taskFinishedOk("Verification of the flash memory was successful.");
         } else {
-            emit taskFailed(QString(tr("Verifying the flash memory failed: avrdude retcode: %1.\n"
+            emit taskFailed(QString(tr("Verifying the flash memory failed: avrdude returned: %1.\n"
                                        "Check the <a href=\"tab_dudeout\">AVRDude output tab </a> for details")).arg(retcode));
         }
         break;
@@ -234,7 +234,7 @@ void AvrProgrammer::dudeFinished(int retcode)
         if (!retcode) {
             emit taskFinishedOk("Reading the EEPROM memory was successful.");
         } else {
-            emit taskFailed(QString(tr("EEPROM reading failed: avrdude retcode: %1.\n"
+            emit taskFailed(QString(tr("EEPROM reading failed: avrdude returned: %1.\n"
                                        "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
         }
     } break;
@@ -242,7 +242,7 @@ void AvrProgrammer::dudeFinished(int retcode)
         if (!retcode) {
             emit taskFinishedOk(tr("Verification of the EEPROM memory was successful."));
         } else {
-            emit taskFailed(QString(tr("EEPROM verification failed: avrdude retcode: %1.\n"
+            emit taskFailed(QString(tr("EEPROM verification failed: avrdude returned: %1.\n"
                                        "Check the <a href=\"tab_dudeout\"> AVRDude output tab </a> for details\n").arg(retcode)));
         }
     } break;
@@ -250,7 +250,7 @@ void AvrProgrammer::dudeFinished(int retcode)
         if (!retcode) {
             emit taskFinishedOk("Programming the EEPROM memory was successful.");
         } else {
-            emit taskFailed(QString(tr("EEPROM writing failed: avrdude retcode: %1.<br>"
+            emit taskFailed(QString(tr("EEPROM writing failed: avrdude returned: %1.<br>"
                                        "Check the <a href=\"tab_dudeout\">AVRDude output tab</a> for details")).arg(retcode));
         }
     } break;

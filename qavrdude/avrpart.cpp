@@ -106,22 +106,11 @@ AvrPart::AvrPart(Settings *sa, QString name, QObject *parent)
     m_fusesModel = new RegistersModel(this);
     m_fuseFieldsModel = new RegisterFieldsModel(this);
 
-    // cross connect the valuechange notifications
-    connect(m_fusesModel, SIGNAL(changed()), m_fuseFieldsModel, SLOT(refresh()));
-    connect(m_fuseFieldsModel, SIGNAL(changed()), m_fusesModel, SLOT(refresh()));
-
     m_lockBytesModel = new RegistersModel(this);
     m_lockByteFieldsModel = new RegisterFieldsModel(this);
 
-    // cross connect the valuechange notifications
-    connect(m_lockBytesModel, SIGNAL(changed()), m_lockByteFieldsModel, SLOT(refresh()));
-    connect(m_lockByteFieldsModel, SIGNAL(changed()), m_lockBytesModel, SLOT(refresh()));
-
     // set the backend data structures
     m_fusesModel->setRegisters(&fuseRegs);
-    m_fuseFieldsModel->setRegisters(&lockBytes);
-
-
     m_fuseFieldsModel->setRegisters(&fuseRegs);
     m_lockByteFieldsModel->setRegisters(&lockBytes);
 
@@ -246,19 +235,10 @@ QString AvrPart::getAvrDudePartNo(QString name) const
 
 bool AvrPart::fillFuseAndLockData()
 {
-    switch (settings->deviceData) {
-    case Settings::DeviceDb_SQLite:
-        return fillFuseAndLockDataFromSQLite();
-        break;
-    case Settings::DeviceDb_XML:
-        return fillFuseAndLockDataFromXML();
-        break;
-    }
-    return false;
-}
+    bool ret = false;
+    fuseFieldsModel()->clear();
+    lockByteFieldsModel()->clear();
 
-bool AvrPart::fillFuseAndLockDataFromSQLite()
-{
     while (fuseRegs.size()) {
         delete fuseRegs.takeFirst();
     }
@@ -266,6 +246,28 @@ bool AvrPart::fillFuseAndLockDataFromSQLite()
     while (lockBytes.size()) {
         delete lockBytes.takeFirst();
     }
+
+    switch (settings->deviceData) {
+    case Settings::DeviceDb_SQLite:
+        ret = fillFuseAndLockDataFromSQLite();
+        break;
+    case Settings::DeviceDb_XML:
+        ret = fillFuseAndLockDataFromXML();
+        break;
+    }
+
+    if (ret)  {
+        // set the backend data structures
+        m_fusesModel->setRegisters(&fuseRegs);
+        m_fuseFieldsModel->setRegisters(&fuseRegs);
+        m_lockByteFieldsModel->setRegisters(&lockBytes);
+    }
+
+    return ret;
+}
+
+bool AvrPart::fillFuseAndLockDataFromSQLite()
+{
 
     if (db.isOpen()) {
         QSqlQuery deviceIdQuery(db);
@@ -328,14 +330,6 @@ bool AvrPart::fillFuseAndLockDataFromSQLite()
 
 bool AvrPart::fillFuseAndLockDataFromXML()
 {
-    while (fuseRegs.size()) {
-        delete fuseRegs.takeFirst();
-    }
-
-    while (lockBytes.size()) {
-        delete lockBytes.takeFirst();
-    }
-
     try {
         domFile.setFileName(settings->xmlsPath+"/"+m_partNameStr+".xml");
         if (!domFile.open(QFile::ReadOnly))  {

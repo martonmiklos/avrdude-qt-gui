@@ -95,8 +95,8 @@ public:
 
     void setRegisters(QList<Register*>* regs);
 
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
@@ -119,12 +119,13 @@ class RegisterFieldsModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    RegisterFieldsModel(QObject *parent = 0) : QAbstractTableModel(parent), m_registers(NULL), m_registerCnt(0) {}
+    RegisterFieldsModel(QObject *parent = 0) : QAbstractTableModel(parent), m_registers(NULL) {}
 
-    void setRegisters(QList<Register*> *regs) {m_registers = regs;}
+    void clear();
+    void setRegisters(QList<Register*> *regs);
 
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
@@ -132,10 +133,6 @@ public:
 
 private:
     QList<Register*> *m_registers;
-    int m_registerCnt;
-
-public slots:
-    void refresh();
 
 signals:
     void changed();

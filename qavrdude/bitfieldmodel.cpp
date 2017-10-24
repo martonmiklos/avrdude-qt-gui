@@ -111,7 +111,7 @@ void RegistersModel::setRegisters(QList<Register *> *regs)
 
 void RegistersModel::refresh()
 {
-    if (m_registers == NULL)
+    /*if (m_registers == NULL)
         return;
 
     beginRemoveRows(this->index(0,0), 0, m_registerCnt);
@@ -120,8 +120,8 @@ void RegistersModel::refresh()
     m_registerCnt = m_registers->size();
 
     beginInsertRows(index(0,0), 0, m_registerCnt);
-    endInsertRows();
-    //reset();
+    endInsertRows();*/
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount()-1, columnCount()));
 }
 
 /* RegisterFieldsModel members: */
@@ -204,16 +204,35 @@ bool RegisterFieldsModel::setData(const QModelIndex &index, const QVariant &valu
     return false;
 }
 
+void RegisterFieldsModel::clear()
+{
+    beginRemoveRows(createIndex(0,0), 0, rowCount());
+    removeRows(0, rowCount());
+    endRemoveRows();
+}
+
+void RegisterFieldsModel::setRegisters(QList<Register *> *regs)
+{
+    m_registers = regs;
+    if (m_registers == NULL)
+        return;
+
+    beginInsertRows(index(0,0), 0, m_registers->size());
+    for (int i = 0; i<m_registers->size(); i++)
+        insertRow(i);
+    endInsertRows();
+}
+
 int RegisterFieldsModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
+
     int rowCount = 0;
     for (int i = 0; i<m_registers->count(); i++) {
         rowCount +=  m_registers->at(i)->bitFields.count();
     }
     return rowCount;
-    return 0;
 }
 
 int RegisterFieldsModel::columnCount(const QModelIndex &parent) const
@@ -221,19 +240,4 @@ int RegisterFieldsModel::columnCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
     return 2;
-}
-
-void RegisterFieldsModel::refresh()
-{
-    if (m_registers == NULL)
-        return;
-
-    beginRemoveRows(this->index(0,0), 0, m_registerCnt);
-    endRemoveRows();
-
-    m_registerCnt = m_registers->size();
-
-    beginInsertRows(index(0,0), 0, m_registerCnt);
-    endInsertRows();
-    //reset();
 }

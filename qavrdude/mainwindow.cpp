@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include <QDir>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QProcess>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,16 +52,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->lineEditFlashHex, SIGNAL(clicked()), this, SLOT(showFlashHexFileBrowse()));
     connect(ui->lineEditEEPROMHex, SIGNAL(clicked()),this, SLOT(showEEPROMHexFileBrowse()));
 
-    textOutPutMenu = ui->textEditMessages->createStandardContextMenu();
-    QAction *clearAction = textOutPutMenu->addAction(tr("Clear all"));
-    connect(clearAction, SIGNAL(triggered()), this, SLOT(clearMessages()));
-
-
     fillDeviceList();
     fillProgrammersList();
     calculateArgumentsLabelText();
     fillDefaultTabComboBox();
-
 
     avrPart = new AvrPart(settings, ui->comboBoxDevice->currentText(), this);
 
@@ -125,6 +121,15 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->tabWidgetMain->setCurrentWidget(ui->tabSettings);
         ui->lineEditXmlsPath->setFocus(Qt::TabFocusReason);
     }
+
+    m_programmerListQueryProcess = new QProcess(this);
+    connect(m_programmerListQueryProcess, (void (QProcess::*)(int,QProcess::ExitStatus))&QProcess::finished, this, &MainWindow::programmerQueryFinished);
+
+    m_programmerListQueryProcess->setProgram(settings->dudePath);
+    m_programmerListQueryProcess->setArguments(QStringList() << "-c" << "?");
+    m_programmerListQueryProcess->setProcessChannelMode(QProcess::MergedChannels);
+    m_programmerListQueryProcess->setReadChannel(QProcess::StandardOutput);
+    m_programmerListQueryProcess->start();
 }
 
 MainWindow::~MainWindow()
@@ -150,51 +155,7 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::fillProgrammersList()
 {
-    ui->comboBoxProgrammer->addItem("STK200","stk200");
-    ui->comboBoxProgrammer->addItem("Atmel STK500","stk500");
-    ui->comboBoxProgrammer->addItem("C2N232I","c2n232i");
-    ui->comboBoxProgrammer->addItem("Direct AVR Parallel Access cable","dapa");
-    ui->comboBoxProgrammer->addItem("serial port banging   reset=rts sck=dtr mosi=txd miso=cts","dasa");
-    ui->comboBoxProgrammer->addItem("serial port banging   reset=!dtr sck=rts mosi=txd miso=cts","dasa3");
-    ui->comboBoxProgrammer->addItem("AVR Dragon in debugWire mode","dragon_dw");
-    ui->comboBoxProgrammer->addItem("AVR Dragon in HVSP mode","dragon_hvsp");
-    ui->comboBoxProgrammer->addItem("AVR Dragon in ISP mode","dragon_isp");
-    ui->comboBoxProgrammer->addItem("AVR Dragon in JTAG mode","dragon_jtag");
-    ui->comboBoxProgrammer->addItem("AVR Dragon in PDI mode","dragon_pdi");
-    ui->comboBoxProgrammer->addItem("AVR Dragon in HVP mode","dragon_pp");
-    ui->comboBoxProgrammer->addItem("Dontronics DT006","dt006");
-    ui->comboBoxProgrammer->addItem("ERE ISP-AVR","ere-isp-avr");
-    ui->comboBoxProgrammer->addItem("Frank-STK200","frank-stk200");
-    ui->comboBoxProgrammer->addItem("Futurlec.com programming cable","futurlec");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkI   running at 115200 Bd","jtag1");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkI   running at 19200 Bd","jtag1slow");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII   running at 115200 Bd","jtag2");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII in AVR32 mode.","jtag2avr32");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII in debugWire mode.","jtag2dw");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII   running at 115200 Bd","jtag2fast");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII in ISP mode.","jtag2isp");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII in PDI mode.","jtag2pdi");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII (19200 Bd)","jtag2slow");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkI   running at 115200 Bd","jtagmkI");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII (19200 Bd)","jtagmkII");
-    ui->comboBoxProgrammer->addItem("Atmel JTAG ICE mkII in AVR32 mode.","jtagmkII_avr32");
-    ui->comboBoxProgrammer->addItem("Crossbow MIB510 programming board","mib510");
-    ui->comboBoxProgrammer->addItem("Jason Kyle’s pAVR Serial Programmer","pavr");
-    ui->comboBoxProgrammer->addItem("Picoweb Programming Cable","picoweb");
-    ui->comboBoxProgrammer->addItem("Pony Prog STK200","pony-stk200");
-    ui->comboBoxProgrammer->addItem("Pony Prog serial","ponyser");
-    ui->comboBoxProgrammer->addItem("Lancos SI-Prog","siprog");
-    ui->comboBoxProgrammer->addItem("Steve Bolt’s Programmer","sp12");
-    ui->comboBoxProgrammer->addItem("Atmel STK500 in HVSP mode(2.x firmware)","stk500hvsp");
-    ui->comboBoxProgrammer->addItem("Atmel STK500 in parallel programming mode (2.x firmware)","stk500pp");
-    ui->comboBoxProgrammer->addItem("Atmel STK500   1.x firmware","stk500v1");
-    ui->comboBoxProgrammer->addItem("Atmel STK500   2.x firmware","stk500v2");
-    ui->comboBoxProgrammer->addItem("Atmel STK600 in ISP mode","stk600");
-    ui->comboBoxProgrammer->addItem("Atmel STK600 in HVSP mode","stk600hvsp");
-    ui->comboBoxProgrammer->addItem("Atmel STK600 in Ppmode","stk600pp");
-    ui->comboBoxProgrammer->addItem("USBasp","usbasp");
-    ui->comboBoxProgrammer->addItem("USBtiny","usbtiny");
-    ui->comboBoxProgrammer->addItem("Xilinx JTAG cable","xil");
+
     ui->comboBoxProgrammer->setCurrentIndex(ui->comboBoxProgrammer->findData(settings->programmerName));
 }
 
@@ -237,7 +198,7 @@ void MainWindow::programmerSelected()
         ui->labelAREF1->setEnabled(true);
         ui->doubleSpinBoxAREF1->setEnabled(true);
     }
-    ui->tabWidgetMain->setTabEnabled(5, hwVisible);
+    //ui->tabWidgetMain->setTabEnabled(4, hwVisible);
 }
 
 void MainWindow::progressStep()
@@ -775,11 +736,11 @@ void MainWindow::on_horizontalSliderVTarget_sliderMoved(int position)
 
 void MainWindow::deviceChanged()
 {
-    avrPart->fuseFieldsModel()->refresh();
-    avrPart->fusesModel()->refresh();
+    for (int i = 0; i<ui->tableViewFuseFields->model()->rowCount(); i++)
+        ui->tableViewFuseFields->closePersistentEditor(avrPart->fuseFieldsModel()->index(i, 1));
 
-    avrPart->lockByteFieldsModel()->refresh();
-    avrPart->lockByteModel()->refresh();
+    for (int i = 0; i<ui->tableViewLockBitFields->model()->rowCount(); i++)
+        ui->tableViewLockBitFields->closePersistentEditor(avrPart->lockByteFieldsModel()->index(i, 1));
 
     //return;
     for (int i = 0; i<ui->tableViewFuseFields->model()->rowCount(); i++)
@@ -841,4 +802,26 @@ void MainWindow::on_pushButtonBrowseSqlite_clicked()
 void MainWindow::on_lineEditProgOptions_editingFinished()
 {
 
+}
+
+void MainWindow::on_textEditMessages_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu *menu = ui->textEditMessages->createStandardContextMenu(pos);
+    menu->addAction(tr("Clear"), this, SLOT(clearMessages()));
+    menu->exec(ui->textEditMessages->mapToGlobal(pos));
+}
+
+void MainWindow::programmerQueryFinished(int status, QProcess::ExitStatus exitStatus)
+{
+    if (exitStatus == QProcess::NormalExit) {
+        QString output = m_programmerListQueryProcess->readAllStandardOutput();
+        QStringList lines = output.split('\n');
+        foreach (QString line, lines) {
+            QRegularExpression re("\\s*(.*)\\s*\\=\\s(.*)");
+            QRegularExpressionMatch matches = re.match(line);
+            if (matches.hasMatch()) {
+                ui->comboBoxProgrammer->addItem(matches.captured(2), matches.captured(1));
+            }
+        }
+    }
 }
