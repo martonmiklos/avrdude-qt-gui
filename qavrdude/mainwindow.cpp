@@ -53,7 +53,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->lineEditEEPROMHex, SIGNAL(clicked()),this, SLOT(showEEPROMHexFileBrowse()));
 
     fillDeviceList();
-    fillProgrammersList();
     calculateArgumentsLabelText();
     fillDefaultTabComboBox();
 
@@ -153,12 +152,6 @@ void MainWindow::changeEvent(QEvent *e)
     }
 }
 
-void MainWindow::fillProgrammersList()
-{
-
-    ui->comboBoxProgrammer->setCurrentIndex(ui->comboBoxProgrammer->findData(settings->programmerName));
-}
-
 void MainWindow::calculateArgumentsLabelText()
 {
     QString args = QString("-c %1 -P %2").arg(settings->programmerName).arg(settings->programmerPort);
@@ -199,6 +192,13 @@ void MainWindow::programmerSelected()
         ui->doubleSpinBoxAREF1->setEnabled(true);
     }
     //ui->tabWidgetMain->setTabEnabled(4, hwVisible);
+}
+
+QString MainWindow::signatureToString(quint8 s0, quint8 s1, quint8 s2)
+{
+    return "0x"+QString::number(s0, 16).rightJustified(2, '0').toUpper()+":"+
+                    "0x"+QString::number(s1, 16).rightJustified(2, '0').toUpper()+":"+
+                    "0x"+QString::number(s2, 16).rightJustified(2, '0').toUpper();
 }
 
 void MainWindow::progressStep()
@@ -414,23 +414,22 @@ void MainWindow::on_comboBoxDevice_activated(int index)
 
 void MainWindow::signatureRead(quint8 s0, quint8 s1, quint8 s2)
 {
-    QString signature;
-    signature = "0x"+QString::number(s0, 16).rightJustified(2, '0').toUpper()+":"+
-                "0x"+QString::number(s1, 16).rightJustified(2, '0').toUpper()+":"+
-                "0x"+QString::number(s2, 16).rightJustified(2, '0').toUpper();
-    ui->lineEditDevSignature->setText(signature);
+    QString signatureRead = signatureToString(s0, s1, s2);
+    QString signatureExpected = signatureToString(avrPart->sign0, avrPart->sign1, avrPart->sign2);
+    ui->lineEditDevSignature->setText(signatureRead);
 
     bool ok = true;
-    if ((avrPart->sign0 != s0) ||
-        (avrPart->sign1 != s1) ||
-        (avrPart->sign2 != s2))
+    if (signatureRead != signatureExpected)
         ok = false;
 
     if (!ok) {
         QMessageBox error(this);
-        error.setWindowTitle("Signature mismatch");
-        error.setText("The signature does not matches the selected device\n"
-                      "Would you like to find it which part is it?");
+        error.setWindowTitle(tr("Signature mismatch"));
+        error.setText(tr("The signature (%1) does not matches the selected device (%2 signature: %3)\n"
+                      "Would you like to find it which part is it?")
+                      .arg(signatureRead)
+                      .arg(ui->comboBoxDevice->currentText())
+                      .arg(signatureExpected));
         error.setStandardButtons(QMessageBox::Yes| QMessageBox::No);
         if (error.exec() == QMessageBox::Yes) {
             QString partIs = avrPart->findDeviceWithSignature(s0, s1, s2);
@@ -823,5 +822,6 @@ void MainWindow::programmerQueryFinished(int status, QProcess::ExitStatus exitSt
                 ui->comboBoxProgrammer->addItem(matches.captured(2), matches.captured(1));
             }
         }
+        ui->comboBoxProgrammer->setCurrentIndex(ui->comboBoxProgrammer->findData(settings->programmerName));
     }
 }

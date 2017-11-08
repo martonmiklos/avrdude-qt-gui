@@ -50,12 +50,12 @@ private:
     QCompleter *programmerArgumentsCompleter;
 
     void fillDeviceList();
-    void fillProgrammersList();
     void calculateArgumentsLabelText();
     void fillDefaultTabComboBox();
     void programmerSelected();
 
     QProcess *m_programmerListQueryProcess;
+    QString signatureToString(quint8 s0, quint8 s1, quint8 s2);
 
 private slots:
     void on_horizontalSliderVTarget_sliderMoved(int position);
